@@ -1,0 +1,1735 @@
+<!-- RainLog 雨量记录 — WeatherNext family UI — last 3 full months + current month to yesterday · Open-Meteo -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>RainLog Lab · 雨量记录实验</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RainLog Lab">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#84d2f8">
+<meta name="format-detection" content="telephone=no">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjogIumbqOmHj+iusOW9lSBSYWluTG9nIiwgInNob3J0X25hbWUiOiAi6Zuo6YeP6K6w5b2VIiwgInN0YXJ0X3VybCI6ICIuIiwgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsICJiYWNrZ3JvdW5kX2NvbG9yIjogIiM4NGQyZjgiLCAidGhlbWVfY29sb3IiOiAiIzg0ZDJmOCIsICJpY29ucyI6IFt7InNyYyI6ICJpY29uLTE5Mi5wbmciLCAic2l6ZXMiOiAiMTkyeDE5MiIsICJ0eXBlIjogImltYWdlL3BuZyIsICJwdXJwb3NlIjogImFueSBtYXNrYWJsZSJ9LCB7InNyYyI6ICJpY29uLTUxMi5wbmciLCAic2l6ZXMiOiAiNTEyeDUxMiIsICJ0eXBlIjogImltYWdlL3BuZyIsICJwdXJwb3NlIjogImFueSBtYXNrYWJsZSJ9XX0=">
+<style>
+  :root{
+    --safe-top:env(safe-area-inset-top);
+    --safe-bottom:env(safe-area-inset-bottom);
+    --blue:#1d4ed8; --blue-deep:#1e3a5f; --sky:#84d2f8;
+    --slate-900:#0f172a; --slate-700:#334155; --slate-600:#475569;
+    --slate-500:#64748b; --slate-400:#94a3b8; --slate-300:#cbd5e1;
+    --slate-200:#e2e8f0; --slate-100:#f1f5f9; --slate-50:#f8fafc;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{line-height:1.5;-webkit-text-size-adjust:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--slate-100); color:#000; margin:0; padding:0;
+    -webkit-font-smoothing:antialiased; min-height:100vh;
+    user-select:none; -webkit-user-select:none;
+    padding-bottom:calc(48px + var(--safe-bottom));
+  }
+  .tabular{font-variant-numeric:tabular-nums}
+  header{
+    background:#fff; border-bottom:2px solid var(--slate-100);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 18px; padding-top:var(--safe-top);
+    height:calc(76px + var(--safe-top));
+    position:sticky; top:0; z-index:50;
+  }
+  .h-left{display:flex; align-items:center; gap:14px; min-width:0}
+  .icon-tile{
+    width:34px; height:34px; background:var(--blue); border-radius:11px;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);
+    flex:none;
+  }
+  .icon-tile img{width:34px; height:34px; border-radius:11px; display:block;}
+  .h-title h1{
+    font-size:20px; font-weight:900; letter-spacing:-.03em; line-height:1;
+    color:var(--slate-900); margin:0; white-space:nowrap;
+  }
+  .h-title .sub{
+    font-size:11px; font-weight:700; color:var(--slate-400);
+    margin-top:5px; text-transform:uppercase; letter-spacing:.02em;
+  }
+  .h-actions{display:flex; align-items:center; gap:8px; flex:none}
+  .add-btn{
+    display:flex; align-items:center; justify-content:center; width:38px; height:38px;
+    background:none; color:var(--blue);
+    border:none; cursor:pointer; transition:transform .15s; flex:none;
+  }
+  .add-btn:active{transform:scale(.9)}
+  .info-btn{
+    display:flex; align-items:center; justify-content:center; width:38px; height:38px;
+    background:none; color:var(--blue);
+    border:none; cursor:pointer; transition:transform .15s; flex:none;
+  }
+  .info-btn:active{transform:scale(.9)}
+  .lang-btn{
+    background:none; color:var(--blue);
+    border:none; border-radius:9999px;
+    height:38px; padding:0 12px; font-size:14px; font-weight:900;
+    cursor:pointer; flex:none; transition:transform .15s, background .15s, color .15s;
+  }
+  .lang-btn:active{transform:scale(.9)}
+  main{max-width:760px; margin:0 auto; padding:14px}
+  .attrib{
+    display:flex; justify-content:center;
+    margin-top:18px; padding-bottom:calc(10px + var(--safe-bottom));
+  }
+  .attrib a{
+    font-size:11px; font-weight:600; color:var(--slate-400);
+    text-decoration:none; letter-spacing:.01em;
+    padding:4px 10px; border-radius:9999px; border:1px solid var(--slate-200);
+    background:var(--slate-100);
+  }
+  .attrib a:hover{color:var(--blue); border-color:#bfdbfe}
+  .loc-list{display:flex; flex-direction:column; gap:12px}
+  /* RainLog Lab: search filter + region accordion */
+  .loc-filter{width:100%; box-sizing:border-box; background:#fff; border:1px solid var(--slate-300);
+    color:var(--slate-900); border-radius:10px; padding:10px 13px; font-size:15px;
+    font-family:inherit; margin-bottom:12px}
+  .loc-filter:focus{outline:2px solid var(--blue); outline-offset:0; border-color:var(--blue)}
+  .loc-group-h{display:flex; align-items:center; gap:9px; cursor:pointer; user-select:none;
+    background:var(--slate-100); border:1px solid var(--slate-200); border-radius:11px;
+    padding:13px 15px; flex-wrap:wrap}
+  .loc-group-h:active{transform:scale(.995)}
+  .lg-caret{color:var(--slate-500); font-size:12px; width:12px; flex-shrink:0}
+  .lg-name{font-size:15px; font-weight:700; color:var(--slate-900); flex-shrink:0}
+  .loc-group-h.open .lg-name{color:var(--blue)}
+  .lg-count{font-size:12px; font-weight:700; color:var(--slate-600); background:#fff;
+    border:1px solid var(--slate-200); border-radius:9999px; padding:1px 10px; min-width:22px;
+    text-align:center; margin-left:auto; flex-shrink:0}
+  .loc-group-body{display:flex; flex-direction:column; gap:12px; margin:12px 0 4px 6px;
+    padding-left:10px; border-left:2px solid var(--slate-200)}
+
+  /* rainy-day threshold toggle */
+  .thresh-toggle{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:#fff; border-radius:14px; padding:10px 12px 10px 14px; margin-bottom:12px;
+    box-shadow:0 1px 2px 0 rgba(0,0,0,.05);
+  }
+  .thresh-label{font-size:15px; font-weight:900; color:var(--slate-700); letter-spacing:-.01em}
+  .thresh-seg{display:flex; gap:3px; background:var(--slate-100); border-radius:9px; padding:3px; flex:none}
+  .thresh-opt{
+    border:none; background:none; cursor:pointer; border-radius:7px;
+    padding:6px 11px; font-size:12px; font-weight:900; color:var(--slate-600);
+    white-space:nowrap; transition:all .15s; line-height:1.2;
+  }
+  .thresh-opt small{display:block; font-size:10px; font-weight:800; color:var(--slate-500); letter-spacing:.02em; margin-top:1px}
+  .thresh-opt.on{background:#fff; color:var(--blue); box-shadow:0 1px 2px rgba(0,0,0,.08)}
+  .thresh-opt.on small{color:#2563eb}
+
+  /* Action bar: on mobile it drops DOWN below the card content as a row of 3 buttons;
+     on desktop (>=760px) it overlays the right edge (sliding in). */
+  .card-wrap{
+    position:relative; width:100%; border-radius:16px; overflow:hidden;
+    background:#fff;
+    box-shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);
+    isolation:isolate;
+  }
+  /* --- mobile default: drop-down row below the card --- */
+  .swipe-actions{
+    display:flex; width:100%; overflow:hidden;
+    max-height:0; opacity:0;
+    transition:max-height .24s cubic-bezier(.2,.8,.2,1), opacity .18s;
+    border-top:0 solid var(--slate-100);
+  }
+  .card-wrap.actions-open .swipe-actions{
+    max-height:64px; opacity:1; border-top-width:1px;
+  }
+  .action-btn{
+    flex:1; display:flex; align-items:center; justify-content:center;
+    border:none; cursor:pointer; color:#fff; height:60px;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .action-btn:active{filter:brightness(.92)}
+  .btn-share{background:#10b981}
+  .btn-edit{background:#3b82f6}
+  .btn-delete{background:#ef4444}
+  .card{
+    position:relative; z-index:10; background:#fff; width:100%;
+  }
+  .action-btn svg{width:26px; height:26px}
+
+  /* --- desktop: overlay on the right edge (sliding in), card content unshifted --- */
+  @media(min-width:760px){
+    .swipe-actions{
+      position:absolute; top:0; bottom:0; right:0; width:168px; max-height:none; opacity:1;
+      z-index:20; border-top:0;
+      transform:translateX(100%);
+      transition:transform .2s cubic-bezier(.2,.8,.2,1);
+    }
+    .card-wrap.actions-open .swipe-actions{ transform:translateX(0); max-height:none; }
+    .action-btn{height:auto}
+    .card-wrap.actions-open .card-head,
+    .card-wrap.actions-open .card-body{
+      padding-right:180px; transition:padding-right .2s cubic-bezier(.2,.8,.2,1);
+    }
+  }
+  .card-head{display:flex; align-items:center; gap:12px; padding:14px 16px 10px}
+  .pin{
+    width:38px; height:38px; border-radius:11px; flex:none;
+    background:linear-gradient(135deg,#38bdf8 0%,#0284c7 100%);
+    display:flex; align-items:center; justify-content:center; font-size:19px;
+    box-shadow:0 1px 2px 0 rgba(0,0,0,.05);
+  }
+  .card-name-wrap{flex:1; min-width:0}
+  .card-name{
+    font-size:18px; font-weight:900; letter-spacing:-.02em; color:var(--slate-900);
+    line-height:1.15; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .card-coords{font-size:12px; font-weight:700; color:var(--slate-400); margin-top:2px}
+  .grip{
+    color:var(--slate-300); flex:none; display:flex; align-items:center; justify-content:center;
+    width:36px; height:36px; margin:-6px -8px -6px 0; padding:0;
+    border:none; background:none; cursor:pointer; border-radius:9px;
+    transition:color .15s, background .15s; -webkit-tap-highlight-color:transparent;
+  }
+  .grip:hover{color:var(--slate-500); background:var(--slate-100)}
+  .grip:active{transform:scale(.9)}
+
+  /* recycle-bin entry link (on Add view) */
+  .bin-entry{
+    display:flex; align-items:center; justify-content:center; gap:8px; width:100%;
+    margin-top:14px; padding:11px; border:none; background:none; cursor:pointer;
+    color:var(--slate-500); font-size:13px; font-weight:800; transition:color .15s;
+  }
+  .bin-entry:hover{color:var(--slate-700)}
+  .bin-entry-count{
+    min-width:18px; height:18px; padding:0 5px; background:#ef4444; color:#fff;
+    font-size:10px; font-weight:900; border-radius:9999px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .bin-entry-count.hidden{display:none}
+  /* back-to-add link (on Recycle view) */
+  .bin-back{
+    display:flex; align-items:center; gap:7px; margin-bottom:14px; padding:6px 0;
+    border:none; background:none; cursor:pointer; color:var(--blue);
+    font-size:14px; font-weight:800;
+  }
+  .bin-back:active{opacity:.6}
+
+
+  .bin-row{
+    display:flex; align-items:center; gap:10px; background:var(--slate-50);
+    border:1px solid var(--slate-100); border-radius:12px; padding:11px 12px; margin-bottom:8px;
+  }
+  .bin-info{flex:1; min-width:0}
+  .bin-name{font-size:15px; font-weight:900; color:var(--slate-700); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .bin-coords{font-size:11px; font-weight:700; color:var(--slate-400); margin-top:1px}
+  .bin-btn{border:none; border-radius:9px; padding:9px 12px; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.03em; cursor:pointer; flex:none; transition:transform .15s}
+  .bin-btn:active{transform:scale(.92)}
+  .bin-restore{background:#dbeafe; color:var(--blue)}
+  .bin-purge{background:#fee2e2; color:#dc2626}
+
+  .card-body{padding:0 16px 14px}
+  .stat-row{display:flex; gap:10px; margin-bottom:12px}
+  .stat{
+    flex:1; min-width:0; border-radius:12px; padding:11px 13px;
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+  .stat.rain{background:#eff6ff}
+  .stat.days{background:#ecfdf5}
+  .stat .n{font-size:26px; font-weight:900; line-height:1; letter-spacing:-.03em; flex:0 0 auto; white-space:nowrap; text-align:right}
+  .stat.rain .n{color:var(--blue)}
+  .stat.days .n{color:#047857}
+  .stat .l{font-size:13px; font-weight:900; line-height:1.15; flex:1 1 auto; min-width:0; word-break:keep-all; overflow-wrap:break-word}
+  .stat.rain .l{color:#1d4ed8}
+  .stat.days .l{color:#047857}
+  .stat .su{font-size:12px; font-weight:900; margin-left:1px; opacity:.85}
+
+  /* 14-day mini bar strip */
+  /* dry-spell tracker (flowering-induction signal) */
+  .dry-wrap{background:#fffbeb; border:1px solid #fef3c7; border-radius:12px; padding:11px 12px 12px; margin-bottom:12px}
+  .dry-cap{font-size:12px; font-weight:900; text-transform:uppercase; letter-spacing:.03em; color:#b45309; margin-bottom:9px}
+  .dry-row{display:flex; gap:10px}
+  .dry-stat{
+    flex:1; min-width:0; background:#fff; border:1px solid #fde68a; border-radius:10px;
+    padding:11px 13px; display:flex; align-items:center; justify-content:space-between; gap:6px;
+  }
+  .dry-stat.hot{background:#fff7ed; border-color:#fdba74}
+  .dry-n{font-size:28px; font-weight:900; line-height:1; color:#c2410c; letter-spacing:-.02em; flex:none; white-space:nowrap}
+  .dry-stat.hot .dry-n{color:#ea580c}
+  .dry-u{font-size:13px; font-weight:900; margin-left:1px}
+  .dry-l{font-size:14px; font-weight:900; color:#92400e; line-height:1.2; flex:1; min-width:0; word-break:keep-all}
+  .dry-range{display:block; font-size:11px; font-weight:700; color:#b45309; letter-spacing:0; margin-top:2px}
+
+  /* Delta-T trendline (historical spray-condition reference) */
+  .dt-wrap{background:var(--slate-50); border:1px solid var(--slate-100); border-radius:12px; padding:10px 12px 8px; margin-bottom:12px}
+  .dt-cap{font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.02em; color:var(--slate-600); margin-bottom:6px; display:flex; justify-content:space-between; align-items:flex-start; gap:8px}
+  .dt-cap>span:first-child{flex:1; min-width:0; line-height:1.3}
+  .dt-sub{white-space:nowrap}
+  .dt-now{font-weight:800; color:#4f46e5; text-transform:none; letter-spacing:0; flex:none; white-space:nowrap}
+  .dt-svg{display:block; width:100%; height:120px}
+  .dt-axis{display:flex; justify-content:space-between; font-size:9px; font-weight:700; color:var(--slate-400); margin-top:2px}
+  .dt-ref{font-size:11px; font-weight:700; color:var(--slate-600); margin-top:7px; line-height:1.45}
+  .dt-legend{display:flex; gap:14px; margin-bottom:4px}
+  .dt-legend span{display:flex; align-items:center; gap:5px; font-size:10px; font-weight:800; color:var(--slate-500)}
+  .dt-legend i{width:14px; height:0; border-top:2px solid currentColor; display:inline-block}
+  .dt-legend .dot-dt{color:#6366f1}
+  .dt-legend .dot-temp{color:#f59e0b}
+
+  .mini-wrap{background:var(--slate-50); border:1px solid var(--slate-100); border-radius:12px; padding:10px 12px 8px; margin-bottom:12px}
+  .mini-cap{font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.03em; color:var(--slate-600); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center}
+  .mini-cap .mx{font-weight:800; color:var(--slate-600); text-transform:none; letter-spacing:0}
+  .mini-bars{display:flex; align-items:flex-end; gap:3px; height:46px}
+  .mini-col{flex:1; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; height:100%}
+  .mini-bar{width:100%; min-height:2px; border-radius:3px 3px 0 0; background:#bfdbfe}
+  .mini-bar.wet{background:linear-gradient(180deg,#38bdf8 0%,#1d4ed8 100%)}
+  .mini-bar.dry{background:var(--slate-200)}
+  .mini-bar.nodata{background:repeating-linear-gradient(45deg,var(--slate-100),var(--slate-100) 2px,#fff 2px,#fff 4px); border:1px dashed var(--slate-200)}
+  .mini-axis{display:flex; justify-content:space-between; font-size:9px; font-weight:700; color:var(--slate-400); margin-top:5px}
+
+  /* monthly rollup */
+  .month-wrap{margin-bottom:12px}
+  .month-cap{font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:.04em; color:var(--slate-500); margin-bottom:7px}
+  .month-row{display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid var(--slate-100)}
+  .month-row:last-child{border-bottom:none}
+  .month-name{font-size:13px; font-weight:900; color:var(--slate-700); width:62px; flex:none}
+  .month-track{flex:1; height:8px; background:var(--slate-100); border-radius:5px; overflow:hidden}
+  .month-fill{height:100%; border-radius:5px; background:linear-gradient(90deg,#38bdf8 0%,#1d4ed8 100%)}
+  .month-mm{font-size:13px; font-weight:900; color:var(--blue); width:62px; text-align:right; flex:none; font-variant-numeric:tabular-nums}
+  .month-days{font-size:12px; font-weight:900; color:#047857; width:40px; text-align:right; flex:none; font-variant-numeric:tabular-nums}
+  .month-partial{color:#c8842b; font-weight:900; margin-left:2px}
+  .month-note{font-size:11px; font-weight:700; color:var(--slate-600); margin-top:8px; line-height:1.45}
+
+  .btn-row{display:flex; gap:8px}
+  .act{
+    flex:1; border:none; border-radius:10px; padding:12px 8px;
+    font-size:12px; font-weight:900; text-transform:uppercase; letter-spacing:.04em;
+    color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    gap:6px; box-shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);
+    transition:transform .15s; line-height:1.2;
+  }
+  .act:active{transform:scale(.95)}
+  .act:disabled{opacity:.45; box-shadow:none; transform:none; cursor:default}
+  .act-get{background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%)}
+  .act-xls{background:linear-gradient(135deg,#059669 0%,#047857 100%)}
+  .card-status{font-size:12px; font-weight:700; text-align:center; margin-top:9px; min-height:1em; color:var(--slate-400)}
+  .empty{text-align:center; padding:56px 24px; color:var(--slate-400)}
+  .empty .big{font-size:52px; margin-bottom:12px}
+  .empty .t{font-size:17px; font-weight:900; color:var(--slate-600)}
+  .empty .d{font-size:13px; font-weight:600; margin-top:6px}
+  /* full-screen user guide */
+  .guide-overlay{
+    position:fixed; left:0; right:0; bottom:0;
+    top:calc(76px + var(--safe-top));   /* start below the sticky header */
+    z-index:45;                          /* above attrib pill, below header (50) */
+    background:var(--slate-50);
+    display:flex; flex-direction:column;
+    transform:translateY(100%); transition:transform .28s cubic-bezier(.2,.8,.2,1);
+    visibility:hidden;
+  }
+  .guide-overlay.on{transform:translateY(0); visibility:visible}
+  .guide-top{
+    flex:none; display:flex; align-items:center; justify-content:space-between;
+    padding:16px 18px 14px; background:#fff;
+    border-bottom:1px solid var(--slate-200);
+  }
+  .guide-top-title{font-size:19px; font-weight:900; color:var(--slate-900); letter-spacing:-.02em}
+  .guide-close{
+    width:38px; height:38px; display:flex; align-items:center; justify-content:center;
+    border:none; background:var(--slate-100); border-radius:9999px; color:var(--slate-600);
+    cursor:pointer; flex:none; transition:transform .15s;
+  }
+  .guide-close:active{transform:scale(.9)}
+  .guide-body{
+    flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    padding:18px 18px calc(40px + var(--safe-bottom)); max-width:680px; width:100%; margin:0 auto;
+  }
+  .g-sec{margin-bottom:22px}
+  .g-h{display:flex; align-items:center; gap:10px; margin-bottom:8px}
+  .g-ico{
+    width:30px; height:30px; flex:none; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    font-size:16px;
+  }
+  .g-h h3{font-size:16px; font-weight:900; color:var(--slate-900); letter-spacing:-.01em}
+  .g-sec p{font-size:14px; font-weight:500; color:var(--slate-600); line-height:1.6; margin-left:40px}
+  .g-sec p b{font-weight:900; color:var(--slate-800)}
+  .g-intro{font-size:14px; font-weight:600; color:var(--slate-600); line-height:1.6; margin-bottom:24px;
+    background:#fff; border:1px solid var(--slate-200); border-radius:12px; padding:14px 16px}
+  .g-foot{font-size:12px; font-weight:600; color:var(--slate-400); line-height:1.6; text-align:center;
+    margin-top:8px; padding-top:18px; border-top:1px solid var(--slate-200)}
+  .g-qr{margin:26px 0 8px; text-align:center}
+  .g-qr-title{font-size:15px; font-weight:900; color:var(--slate-800); margin-bottom:12px}
+  .g-qr-box{display:inline-block; background:#fff; padding:14px; border-radius:16px; border:1px solid var(--slate-200);
+    box-shadow:0 4px 6px -1px rgba(0,0,0,.06)}
+  .g-qr-box svg{display:block}
+  .g-qr-sub{font-size:12px; font-weight:600; color:var(--slate-500); margin-top:10px; line-height:1.5}
+
+  .overlay{
+    position:fixed; inset:0; background:rgba(15,23,42,.5); z-index:1000;
+    display:none; align-items:flex-end; justify-content:center;
+  }
+  .overlay.on{display:flex}
+  .sheet{
+    background:#fff; width:100%; max-width:760px;
+    border-radius:22px 22px 0 0; padding:22px 18px;
+    padding-bottom:calc(26px + var(--safe-bottom));
+    max-height:92vh; overflow:auto; position:relative;
+  }
+  .sheet h2{font-size:19px; font-weight:900; color:var(--slate-900); margin:0 0 4px; letter-spacing:-.02em}
+  .sheet .sd{font-size:13px; font-weight:600; color:var(--slate-500); margin-bottom:16px}
+  .x-btn{
+    position:absolute; top:16px; right:16px; background:none; border:none;
+    color:var(--slate-300); cursor:pointer; padding:6px; line-height:1;
+  }
+  label{display:block; font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:.06em; color:var(--slate-500); margin:14px 0 6px}
+  input{
+    width:100%; border:1.5px solid var(--slate-200); border-radius:11px;
+    padding:13px; font-size:17px; font-weight:600; background:#fff; color:var(--slate-900);
+    font-family:inherit;
+  }
+  input::placeholder{font-weight:400; color:var(--slate-400)}
+  input:focus{outline:none; border-color:var(--blue); box-shadow:0 0 0 3px rgba(29,78,216,.12)}
+  .coord-pair{display:flex; gap:10px}
+  .coord-pair>div{flex:1}
+  .gps-btn{
+    width:100%; margin-top:12px; background:#eff6ff; color:var(--blue);
+    border:1.5px solid #bfdbfe; border-radius:11px; padding:13px;
+    font-size:14px; font-weight:900; cursor:pointer; text-transform:uppercase; letter-spacing:.03em;
+    display:flex; align-items:center; justify-content:center; gap:8px; transition:transform .15s;
+  }
+  .gps-btn:active{transform:scale(.97)}
+  .gps-status{font-size:12px; font-weight:700; text-align:center; margin-top:8px; min-height:1em; color:var(--slate-400)}
+  .sheet-actions{display:flex; gap:10px; margin-top:22px}
+  .s-act{flex:1; border:none; border-radius:12px; padding:14px; font-size:15px; font-weight:900; cursor:pointer; transition:transform .15s; letter-spacing:.02em}
+  .s-act:active{transform:scale(.96)}
+  .s-cancel{background:var(--slate-100); color:var(--slate-600)}
+  .s-save{background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%); color:#fff; box-shadow:0 4px 6px -1px rgba(29,78,216,.25)}
+  .spin{display:inline-block; width:14px; height:14px; border:2.5px solid rgba(255,255,255,.45); border-top-color:#fff; border-radius:50%; animation:sp .7s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  @keyframes bootspin{to{transform:rotate(360deg)}}
+  @media(min-width:760px){
+    .overlay{align-items:center}
+    .sheet{border-radius:22px; max-height:86vh}
+  }
+  @media(max-width:430px){
+    /* stack each tile: label on top row, big number on its own row below */
+    .stat{
+      flex-direction:column; align-items:flex-start; justify-content:center;
+      gap:4px; padding:11px 13px;
+    }
+    .stat .l{font-size:13px; line-height:1.2; flex:none; width:100%}
+    .stat .n{font-size:27px; text-align:left; width:100%}
+    .stat.rain .n{font-size:27px}
+    .stat .su, .dry-u{font-size:12px}
+    /* dry tiles: same two-row stack — label (+ date range) on top, number below */
+    .dry-stat{
+      flex-direction:column; align-items:flex-start; justify-content:space-between;
+      gap:4px; padding:11px 13px;
+    }
+    .dry-l{font-size:13px; line-height:1.2; flex:none; width:100%}
+    .dry-n{font-size:27px; text-align:left; width:100%; margin-top:auto}
+  }
+  @media(max-width:380px){
+    .h-title h1{font-size:18px}
+    .stat .n, .dry-n{font-size:24px}
+  }
+  @media(max-width:360px){
+    .stat .n, .dry-n{font-size:22px}
+    .stat .l, .dry-l{font-size:12px}
+  }
+</style>
+</head>
+<body>
+
+<div id="boot-screen" style="position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#84d2f8;transition:opacity .4s ease;">
+  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAMXUlEQVR4nO3de3BU1R0H8O85e3fZJJuEyKO8rBbxgaNEp4gOBURIgEoLIjggiNqKEYkiGCFaqxA7FUkI4aXTlnZsq05bh/oaq2ildqrF6TjTGVt1tNRWxxcjWgxRkGx2b/9IAgGS7CPn7rl7f9/PzG9GxmRz9t77u+d5z1Wlq5e7IBLKcV1e/ySXtl0AIpuYACQaE4BEYwKQaA7YBybBWAOQaEwAEo0JQKIxAUg0doJJNNYAJJoDVgEkGGsAEo2rQUk0doJJNDaBSDQmAInGBCDRmAAkGjvBJBprABKNCUCiMQFINCYAieaASyFIMNYAJJrD+z9JxhqARGMCkGicCSbRWAOQaEwAEo0JQKIxAUg0doJJNNYAJBoTgETjznAkGmsAEo2dYBKNNQCJxgQg0ZgAFr1QvQl/XLbJdjFEYwJYcm9FPcadFcGFoyP48dR628URS8MFGLkNBYVl340d+Xf1rBgUlPVySQzWABbsuWcrtDr6b62Ad3601V6BBGMC5NjTVU0Y1P/EindAqcaTS5rsFk4gJkAO1Y6/DxPP7dfj/59c3g+rLrovhyUiJkCOKKVQM6845c+tnl8MpVTKnyMz2AnOUbxauxmRsEr5o2FH4dXazdbLKyW09RIIiG2zGzBqmJP2r4wa5mDLrAbr5ZYQbAJ5TCmFRVOLMv69xRVFbArlABPAY2/fsw3ZXMdKAW/VcWjUa9p+JRTc+O013Q95phuDy0J4ZPFG698jyMHl0B6pOvdeTB8b7fPnXDquAOohBb7Q3BtsAnnkzkWlxm5T7923Lefll4IJ4IEnqzahpMjcCHNxocZjnCX2BBPAsOrz12FSL7O92bqkPIql5euMf650TADDaheUePbZdyz07rOl4kywwXjy+k2IFXp3SIsLNR5f0mT9ewYpWAMYcuP56zBxjPmmz/EuLo+iasy9nv8dKZgAhqyeX5Kzu9btV5bm7HsFHRPAgN9c02R01CdVlMY0Hr5qY66+XqBxZ7g+UkphmoEJr0x9+8ICqEfACbI+cpDkAcyaUnijzt4k1Zt12zD6rmrwXc/ZYxOoD7Ze3ojBJ4WsDWIMKgth85zGXHzVwGICZElpjfmTi6wP4y2YXASleRqzxSOXpZdqthyzs4MtIQ28vGqL7WLkLSZAFlZNqMdZp4RtF+OIM08O47bx3FwrG1wOnSmlUH1Zie8OW/WcEmzYrdghzhBrgAw9dHUTiqI+aPscJ1ag8EvODWSMCZABpTVmjCuwXYwezbyokB3iDPFopUsp7K7dAteFr2N3LTvEmWACpGnVt9bjtOH+6fj25LThYdSwQ5w2LodOJ6CwdFbqXd384sbZxQB3m04ruDFWGnH/vEZP1/mbjuIija1zG31QEv8Hm0CpKIU5kzLf2Mq2uRcXIasNiYRhAqTw1LItCCnYvlFlHCEFPHbDZm8OSoA4tgvgZ0prjBvdD67tgmRp/DlRKK3hJpO2i+Jb+dOwtRAv1eb/1oR/Wb3V+nH0c7AJ1IMbvrkeo/Jg2DOV00eEOTnWC+4N2kMs7VjvE4T4e9391svg1+CtoRurJzVgSFnI/tkxFEPKQqiZwMmx7jABjqcUvj8zfya90rVkJjfV6g47wcfFmop69C8K3n2hrFjjh1MbrB9fv0XwznQfXVVZbPuceBaLpwevZusrJkAXdTM2IFYY3ENSUqhxV0WD7WL4SnDPdhaurIjZLoLnFs9gLdAVF8N1xJ1TGxCLauvr+b2OWFTjjil8A2VnsBPcEQsr5NwZF1XGrB9vvwSbQABWTmhAWbGcQ3FScQjL+dAMACYAAGBhZcz2jSjnsWianBqvN+ITQGmNYQPlLYodMcjhGiEwAfDsCrmrJf+wnA/Qy7v1daUUzhkZgWu7HJaMGdWv/akxwZtpiR4F+unCJhPHMK89sKDJ+nmwGaKbQJVjC20XwbrpF8g+BmIT4NaL6xEOK89vMgCAjmfTfXDDOyEiEYUVE+UOiYpNgDmTvF32oID27dM7mthuql+waPbE4C8B6YnMTrBSOPVrDrzq/OmOPany5Vn0UcMcsZ1hkZ3gxss3ePbxSgEJF0i61r9mRrF+9gb7hbAQIhfDVY71ZqMrpZC37xycdkEhbJ8XGyGvD6AU+nu07iefWxADSkMid5ITlwCbrzD/EomgXDcb58p7wYa4TvDE8gKjd2rdOcqTx3f/ThPLC4AdtkuRW7LeEaZUe1VvkFZAW56M9qQyuCyEI+O2QohqAt1u+HlYR7eP+ARJ7RRZzwyLSoDOjW5Nhdb5N9yZKsae3a8vhzjvOAG7gfXqnJHmTq6j83fIszdjRubvbtjZkFMDKIVI2NxwjRMCEgFp+3fVL6KCM6yVBjEzwbdMqDe2swJcIKQUEkkzn+e3uHn8euvnK1chpgY442RzI766Y/48qM74ev5vC58uMQkwcnjE2GeFAt5CGDlMTgKImQgbMdjclIfqsr4/iIYPEpUAQT2Nx4oVmKvslGpf79/57rygKY1pBPObnUjGTLBHV6pWwRwJOkLAtSGkCaSMn0sX7Z3hoCyDOFFQ67djiekEm9S5VMbh0ct7PIVZ6JwBDmklac4okJgAWehMgHjClbRwMpBkdILhGv2ane3+r9oC3Er2+1YWhsjoBHdOfRuSdIF4mws3sB1giLj4AUFNoDbDC/dbE0Y/zlficSFXP6TUAAD2ftaG4YPNzXAGd/gT+PDTNttFyBkxM8HvfRw3mgBB9u7eOKRcF2KWQ+95v9XYQQu6Pe+3Wj9fuQpVsPB7MlJdaezZtt12KfLC6Tddj2D38I8S0wSCm0QiCYTEdPuzk0i4HRe/jOtC0OXg4u13D9suhO+98e5hSLn4AUGjQADw8j8PYbTBB+N7k0i4xkaKHA2EcvQUzl9fO5STv+MXquDKa+WkOxT+9cAvPP8rBw8l8fFncWPLJJQChg4Io9DgMw3dcV3gzOrrIKkGENQEAgAXb+WgGXTgYMLoGiHXbf9Mr73+n68g6eIHxCUAMHvDTZ7vqlBc0L79orFdKND+mV6Xe17TzRbPjB2i+gAA4CaTOPBlEiVF3uV+YYHGqUMjedUH+LwlATdfXmljkJDVoF25eOzFZlz7nTJP/0oopBAyuw+vp37/YsvR6kYQcU0gAFj3zG348pC8u11PWg4mUb+zxnYxrNA+mI22EC4eea7ZB+XwRzz8bDNcuNbLYSNE1gAAsOH5Gny8r83+GbAcH34SR9MumXd/QHACAMDktUttF8G6KXU32i6CVXLWAnXHTWDn377A9Au9fVH0l4cSaItn9jtOGCgq8LYX/ezuFsAN8JM9aVDR+dcIzgAAUPjzPT/DkIHejAh/fiCBz5qze8BkQKmD/iXeJMEH++KoWHMDRN8AIbwJ1M7F5DVVnj0G2NqW/ef25Xd7czjuomItL36ACdDOdTFm5fWe9DNLizXCEQWlkVGEIwqlxeafV0q6QPmKJZA45t8dcTPBPXGTCfz66f24eqbZCbKIo3Hy4D5szW74On3wqc8h5WGXdLAG6GLdM7fi8RcP2C6GZ3bsakbDcyttF8NXHPBmcIwfPHoLXGzCnEtKbRfFqB27mnH3jhW2i+E7rAG6ceejK/Crp/fbLoYRrgs8+NR+Xvw9UNErpA+D9kJrvLb55wg7+bkDbmubi/NuWQIIXOWZLtYAvUkmUb78Onz0adz6mxszjQ8+ieO85dfx4k+BCZCK66Li7io8/0qL7ZKkbefuFkxbW8WhzjSo6Dw2gdKmNV6o+wmGDvTnDnMf7Yujcu1S3vUzwBogE8kkKu6uwvYn9uOLQ0nbCzmPRMvBJLY//j9UrqnixZ8hFZ13NWuAbCiFVZduxGWTS1Aas/PoV/MXCTzxpwNo2HkrmztZYgL0lQKUDuF3K+/H2adFc/InX3/nKyzYuKx9Rpdnr0+YACYphRUVjbhoTCFGfyNqbBvGRMLFm/89jFf+cRBbdtXwbm+Qis5lAnhCAVAaNTMaMWpEGKcMjWDIwHDKOYXWNhd798Xx3t5W/PuDODburOGd3kNMgFzr+lrJzv/uekfn3T2nuBo013ix+wqHQUk0JgCJJnBnOKKjWAOQaEwAEs1hC4gkYw1AojkciybJWAOQaEwAEo0JQKIxAUg0zgSTaKwBSDQmAInGBCDRmAAkGjvBJBprABKNCUCiyX5NKonHGoBEYyeYRGMNQKIxAUg0JgCJxgQg0dgJJtFYA5BoTAASjQlAojEBSLT/A7aspUCJj/I4AAAAAElFTkSuQmCC" width="104" height="104" alt="RainLog"
+       style="border-radius:24px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.18));"
+       onerror="this.style.display='none';"/>
+  <div style="margin-top:22px;width:34px;height:34px;border:4px solid rgba(255,255,255,.6);border-top-color:#1e3a5f;border-radius:50%;animation:bootspin .8s linear infinite;"></div>
+  <div style="margin-top:18px;font-size:16px;font-weight:800;color:#0b3a5c;letter-spacing:.02em;">雨量记录 RainLog</div>
+  <div style="margin-top:4px;font-size:13px;font-weight:700;color:#1e5b8a;letter-spacing:.02em;">载入中… Loading…</div>
+</div>
+
+<header>
+  <div class="h-left">
+    <div class="icon-tile" aria-hidden="true">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAMXUlEQVR4nO3de3BU1R0H8O85e3fZJJuEyKO8rBbxgaNEp4gOBURIgEoLIjggiNqKEYkiGCFaqxA7FUkI4aXTlnZsq05bh/oaq2ildqrF6TjTGVt1tNRWxxcjWgxRkGx2b/9IAgGS7CPn7rl7f9/PzG9GxmRz9t77u+d5z1Wlq5e7IBLKcV1e/ySXtl0AIpuYACQaE4BEYwKQaA7YBybBWAOQaEwAEo0JQKIxAUg0doJJNNYAJJoDVgEkGGsAEo2rQUk0doJJNDaBSDQmAInGBCDRmAAkGjvBJBprABKNCUCiMQFINCYAieaASyFIMNYAJJrD+z9JxhqARGMCkGicCSbRWAOQaEwAEo0JQKIxAUg0doJJNNYAJBoTgETjznAkGmsAEo2dYBKNNQCJxgQg0ZgAFr1QvQl/XLbJdjFEYwJYcm9FPcadFcGFoyP48dR628URS8MFGLkNBYVl340d+Xf1rBgUlPVySQzWABbsuWcrtDr6b62Ad3601V6BBGMC5NjTVU0Y1P/EindAqcaTS5rsFk4gJkAO1Y6/DxPP7dfj/59c3g+rLrovhyUiJkCOKKVQM6845c+tnl8MpVTKnyMz2AnOUbxauxmRsEr5o2FH4dXazdbLKyW09RIIiG2zGzBqmJP2r4wa5mDLrAbr5ZYQbAJ5TCmFRVOLMv69xRVFbArlABPAY2/fsw3ZXMdKAW/VcWjUa9p+JRTc+O013Q95phuDy0J4ZPFG698jyMHl0B6pOvdeTB8b7fPnXDquAOohBb7Q3BtsAnnkzkWlxm5T7923Lefll4IJ4IEnqzahpMjcCHNxocZjnCX2BBPAsOrz12FSL7O92bqkPIql5euMf650TADDaheUePbZdyz07rOl4kywwXjy+k2IFXp3SIsLNR5f0mT9ewYpWAMYcuP56zBxjPmmz/EuLo+iasy9nv8dKZgAhqyeX5Kzu9btV5bm7HsFHRPAgN9c02R01CdVlMY0Hr5qY66+XqBxZ7g+UkphmoEJr0x9+8ICqEfACbI+cpDkAcyaUnijzt4k1Zt12zD6rmrwXc/ZYxOoD7Ze3ojBJ4WsDWIMKgth85zGXHzVwGICZElpjfmTi6wP4y2YXASleRqzxSOXpZdqthyzs4MtIQ28vGqL7WLkLSZAFlZNqMdZp4RtF+OIM08O47bx3FwrG1wOnSmlUH1Zie8OW/WcEmzYrdghzhBrgAw9dHUTiqI+aPscJ1ag8EvODWSMCZABpTVmjCuwXYwezbyokB3iDPFopUsp7K7dAteFr2N3LTvEmWACpGnVt9bjtOH+6fj25LThYdSwQ5w2LodOJ6CwdFbqXd384sbZxQB3m04ruDFWGnH/vEZP1/mbjuIija1zG31QEv8Hm0CpKIU5kzLf2Mq2uRcXIasNiYRhAqTw1LItCCnYvlFlHCEFPHbDZm8OSoA4tgvgZ0prjBvdD67tgmRp/DlRKK3hJpO2i+Jb+dOwtRAv1eb/1oR/Wb3V+nH0c7AJ1IMbvrkeo/Jg2DOV00eEOTnWC+4N2kMs7VjvE4T4e9391svg1+CtoRurJzVgSFnI/tkxFEPKQqiZwMmx7jABjqcUvj8zfya90rVkJjfV6g47wcfFmop69C8K3n2hrFjjh1MbrB9fv0XwznQfXVVZbPuceBaLpwevZusrJkAXdTM2IFYY3ENSUqhxV0WD7WL4SnDPdhaurIjZLoLnFs9gLdAVF8N1xJ1TGxCLauvr+b2OWFTjjil8A2VnsBPcEQsr5NwZF1XGrB9vvwSbQABWTmhAWbGcQ3FScQjL+dAMACYAAGBhZcz2jSjnsWianBqvN+ITQGmNYQPlLYodMcjhGiEwAfDsCrmrJf+wnA/Qy7v1daUUzhkZgWu7HJaMGdWv/akxwZtpiR4F+unCJhPHMK89sKDJ+nmwGaKbQJVjC20XwbrpF8g+BmIT4NaL6xEOK89vMgCAjmfTfXDDOyEiEYUVE+UOiYpNgDmTvF32oID27dM7mthuql+waPbE4C8B6YnMTrBSOPVrDrzq/OmOPany5Vn0UcMcsZ1hkZ3gxss3ePbxSgEJF0i61r9mRrF+9gb7hbAQIhfDVY71ZqMrpZC37xycdkEhbJ8XGyGvD6AU+nu07iefWxADSkMid5ITlwCbrzD/EomgXDcb58p7wYa4TvDE8gKjd2rdOcqTx3f/ThPLC4AdtkuRW7LeEaZUe1VvkFZAW56M9qQyuCyEI+O2QohqAt1u+HlYR7eP+ARJ7RRZzwyLSoDOjW5Nhdb5N9yZKsae3a8vhzjvOAG7gfXqnJHmTq6j83fIszdjRubvbtjZkFMDKIVI2NxwjRMCEgFp+3fVL6KCM6yVBjEzwbdMqDe2swJcIKQUEkkzn+e3uHn8euvnK1chpgY442RzI766Y/48qM74ev5vC58uMQkwcnjE2GeFAt5CGDlMTgKImQgbMdjclIfqsr4/iIYPEpUAQT2Nx4oVmKvslGpf79/57rygKY1pBPObnUjGTLBHV6pWwRwJOkLAtSGkCaSMn0sX7Z3hoCyDOFFQ67djiekEm9S5VMbh0ct7PIVZ6JwBDmklac4okJgAWehMgHjClbRwMpBkdILhGv2ane3+r9oC3Er2+1YWhsjoBHdOfRuSdIF4mws3sB1giLj4AUFNoDbDC/dbE0Y/zlficSFXP6TUAAD2ftaG4YPNzXAGd/gT+PDTNttFyBkxM8HvfRw3mgBB9u7eOKRcF2KWQ+95v9XYQQu6Pe+3Wj9fuQpVsPB7MlJdaezZtt12KfLC6Tddj2D38I8S0wSCm0QiCYTEdPuzk0i4HRe/jOtC0OXg4u13D9suhO+98e5hSLn4AUGjQADw8j8PYbTBB+N7k0i4xkaKHA2EcvQUzl9fO5STv+MXquDKa+WkOxT+9cAvPP8rBw8l8fFncWPLJJQChg4Io9DgMw3dcV3gzOrrIKkGENQEAgAXb+WgGXTgYMLoGiHXbf9Mr73+n68g6eIHxCUAMHvDTZ7vqlBc0L79orFdKND+mV6Xe17TzRbPjB2i+gAA4CaTOPBlEiVF3uV+YYHGqUMjedUH+LwlATdfXmljkJDVoF25eOzFZlz7nTJP/0oopBAyuw+vp37/YsvR6kYQcU0gAFj3zG348pC8u11PWg4mUb+zxnYxrNA+mI22EC4eea7ZB+XwRzz8bDNcuNbLYSNE1gAAsOH5Gny8r83+GbAcH34SR9MumXd/QHACAMDktUttF8G6KXU32i6CVXLWAnXHTWDn377A9Au9fVH0l4cSaItn9jtOGCgq8LYX/ezuFsAN8JM9aVDR+dcIzgAAUPjzPT/DkIHejAh/fiCBz5qze8BkQKmD/iXeJMEH++KoWHMDRN8AIbwJ1M7F5DVVnj0G2NqW/ef25Xd7czjuomItL36ACdDOdTFm5fWe9DNLizXCEQWlkVGEIwqlxeafV0q6QPmKJZA45t8dcTPBPXGTCfz66f24eqbZCbKIo3Hy4D5szW74On3wqc8h5WGXdLAG6GLdM7fi8RcP2C6GZ3bsakbDcyttF8NXHPBmcIwfPHoLXGzCnEtKbRfFqB27mnH3jhW2i+E7rAG6ceejK/Crp/fbLoYRrgs8+NR+Xvw9UNErpA+D9kJrvLb55wg7+bkDbmubi/NuWQIIXOWZLtYAvUkmUb78Onz0adz6mxszjQ8+ieO85dfx4k+BCZCK66Li7io8/0qL7ZKkbefuFkxbW8WhzjSo6Dw2gdKmNV6o+wmGDvTnDnMf7Yujcu1S3vUzwBogE8kkKu6uwvYn9uOLQ0nbCzmPRMvBJLY//j9UrqnixZ8hFZ13NWuAbCiFVZduxGWTS1Aas/PoV/MXCTzxpwNo2HkrmztZYgL0lQKUDuF3K+/H2adFc/InX3/nKyzYuKx9Rpdnr0+YACYphRUVjbhoTCFGfyNqbBvGRMLFm/89jFf+cRBbdtXwbm+Qis5lAnhCAVAaNTMaMWpEGKcMjWDIwHDKOYXWNhd798Xx3t5W/PuDODburOGd3kNMgFzr+lrJzv/uekfn3T2nuBo013ix+wqHQUk0JgCJJnBnOKKjWAOQaEwAEs1hC4gkYw1AojkciybJWAOQaEwAEo0JQKIxAUg0zgSTaKwBSDQmAInGBCDRmAAkGjvBJBprABKNCUCiyX5NKonHGoBEYyeYRGMNQKIxAUg0JgCJxgQg0dgJJtFYA5BoTAASjQlAojEBSLT/A7aspUCJj/I4AAAAAElFTkSuQmCC" width="34" height="34" alt="RainLog" style="border-radius:11px;display:block;"/>
+    </div>
+    <div class="h-title">
+      <h1 id="t-title">RainLog Lab</h1>
+    </div>
+  </div>
+  <div class="h-actions">
+    <button class="info-btn" id="infoBtn" onclick="openGuide()" title="使用说明 Guide" aria-label="使用说明 Guide">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.25"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.6" r="0.1" stroke-width="2.6"/></svg>
+    </button>
+    <button class="add-btn" id="addBtn" onclick="openSheet()" title="添加地点 Add location" aria-label="添加地点 Add location">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()">中</button>
+  </div>
+</header>
+
+<!-- full-screen user guide -->
+<div class="guide-overlay" id="guideOverlay">
+  <div class="guide-top">
+    <div class="guide-top-title" id="t-guide-title">使用说明</div>
+    <button class="guide-close" onclick="closeGuide()" aria-label="关闭 Close">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="guide-body" id="guideBody"></div>
+</div>
+
+<main>
+  <div class="thresh-toggle" id="threshToggle" style="display:none">
+    <span class="thresh-label" id="t-thresh-label">有雨天数标准</span>
+    <div class="thresh-seg">
+      <button class="thresh-opt" id="thresh-1" onclick="setThresh(1.0)"></button>
+      <button class="thresh-opt" id="thresh-25" onclick="setThresh(2.5)"></button>
+    </div>
+  </div>
+  <input type="text" id="locFilter" class="loc-filter" placeholder="" autocomplete="off" oninput="render()" style="display:none">
+  <div class="loc-list" id="locList"></div>
+  <div class="attrib">
+    <a href="https://open-meteo.com/" target="_blank" rel="noopener" id="t-attrib">Data: Open-Meteo</a>
+  </div>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <button class="x-btn" onclick="closeSheet()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <h2 id="t-sheet-title">添加地点</h2>
+    <div class="sd" id="t-sheet-desc">为地点命名，然后输入坐标或使用 GPS 定位。</div>
+
+    <div id="view-manual">
+      <label id="t-l-name" for="inName">地点名称 / NAME</label>
+      <input id="inName" name="locName" placeholder="我的榴莲芭" autocomplete="off">
+      <label id="t-l-coords" for="inLat">坐标 纬度 / 经度</label>
+      <div class="coord-pair">
+        <div><input id="inLat" name="locLat" inputmode="decimal" placeholder="Lat 3.2478" autocomplete="off"></div>
+        <div><input id="inLng" name="locLng" inputmode="decimal" placeholder="Lng 102.4189" autocomplete="off"></div>
+      </div>
+      <button class="gps-btn" onclick="useGPS()">
+        <span style="font-size:16px">📍</span><span id="t-gps">使用我的 GPS 定位</span>
+      </button>
+      <div class="gps-status" id="gpsStatus"></div>
+      <div class="sheet-actions">
+        <button class="s-act s-cancel" onclick="closeSheet()" id="t-cancel">取消</button>
+        <button class="s-act s-save" onclick="saveLoc()" id="t-save">保存</button>
+      </div>
+      <button class="bin-entry" id="binEntry" onclick="switchTab('recycle')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        <span id="t-bin-entry">回收站</span>
+        <span class="bin-entry-count" id="binCount">0</span>
+      </button>
+    </div>
+
+    <div id="view-recycle" style="display:none">
+      <button class="bin-back" onclick="switchTab('manual')">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        <span id="t-bin-back">返回添加</span>
+      </button>
+      <div id="binList"></div>
+    </div>
+  </div>
+</div>
+
+<script src="xlsx.full.min.js"></script>
+<script src="html2canvas.min.js"></script>
+<script>
+const NS="rainlog_lab";
+const KEY=NS+".locations";
+const CACHEKEY=NS+".cache";
+const BINKEY=NS+".bin";
+const LANGKEY=NS+".lang";
+const THRESHKEY=NS+".thresh";
+// "Rainy day" threshold (mm). 1.0 = WMO/official standard; 2.5 = agricultural "useful rain".
+let RAIN_DAY_MM=parseFloat(localStorage.getItem(THRESHKEY))||1.0;
+let lang=localStorage.getItem(LANGKEY)||"zh";
+// One-tap language toggle: cycle order + each language's OWN label (shown on the
+// button to indicate the language the UI is currently in).
+// Add more languages here later, e.g. "ms":"BM", "ta":"த".
+const LANG_CYCLE=["zh","en"];
+const LANG_LBL={zh:"中", en:"EN"};
+// QR code for sharing the app (https://stanleywoosweeleong.github.io/Rainlog-lab/)
+const QR_N=37;
+const QR_PATH="M2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM5 2h1v1h-1zM6 2h1v1h-1zM7 2h1v1h-1zM8 2h1v1h-1zM11 2h1v1h-1zM12 2h1v1h-1zM14 2h1v1h-1zM16 2h1v1h-1zM20 2h1v1h-1zM23 2h1v1h-1zM24 2h1v1h-1zM28 2h1v1h-1zM29 2h1v1h-1zM30 2h1v1h-1zM31 2h1v1h-1zM32 2h1v1h-1zM33 2h1v1h-1zM34 2h1v1h-1zM2 3h1v1h-1zM8 3h1v1h-1zM10 3h1v1h-1zM12 3h1v1h-1zM14 3h1v1h-1zM15 3h1v1h-1zM16 3h1v1h-1zM18 3h1v1h-1zM19 3h1v1h-1zM22 3h1v1h-1zM23 3h1v1h-1zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h1v1h-1zM34 3h1v1h-1zM2 4h1v1h-1zM4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM10 4h1v1h-1zM12 4h1v1h-1zM14 4h1v1h-1zM15 4h1v1h-1zM18 4h1v1h-1zM19 4h1v1h-1zM20 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM28 4h1v1h-1zM30 4h1v1h-1zM31 4h1v1h-1zM32 4h1v1h-1zM34 4h1v1h-1zM2 5h1v1h-1zM4 5h1v1h-1zM5 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h1v1h-1zM12 5h1v1h-1zM13 5h1v1h-1zM23 5h1v1h-1zM24 5h1v1h-1zM25 5h1v1h-1zM26 5h1v1h-1zM28 5h1v1h-1zM30 5h1v1h-1zM31 5h1v1h-1zM32 5h1v1h-1zM34 5h1v1h-1zM2 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM11 6h1v1h-1zM12 6h1v1h-1zM13 6h1v1h-1zM15 6h1v1h-1zM17 6h1v1h-1zM20 6h1v1h-1zM23 6h1v1h-1zM25 6h1v1h-1zM28 6h1v1h-1zM30 6h1v1h-1zM31 6h1v1h-1zM32 6h1v1h-1zM34 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM12 7h1v1h-1zM13 7h1v1h-1zM18 7h1v1h-1zM22 7h1v1h-1zM24 7h1v1h-1zM28 7h1v1h-1zM34 7h1v1h-1zM2 8h1v1h-1zM3 8h1v1h-1zM4 8h1v1h-1zM5 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM22 8h1v1h-1zM24 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM29 8h1v1h-1zM30 8h1v1h-1zM31 8h1v1h-1zM32 8h1v1h-1zM33 8h1v1h-1zM34 8h1v1h-1zM10 9h1v1h-1zM14 9h1v1h-1zM16 9h1v1h-1zM24 9h1v1h-1zM25 9h1v1h-1zM2 10h1v1h-1zM8 10h1v1h-1zM10 10h1v1h-1zM11 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM19 10h1v1h-1zM24 10h1v1h-1zM25 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM28 10h1v1h-1zM31 10h1v1h-1zM32 10h1v1h-1zM33 10h1v1h-1zM2 11h1v1h-1zM3 11h1v1h-1zM4 11h1v1h-1zM5 11h1v1h-1zM6 11h1v1h-1zM7 11h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM17 11h1v1h-1zM20 11h1v1h-1zM21 11h1v1h-1zM23 11h1v1h-1zM25 11h1v1h-1zM30 11h1v1h-1zM31 11h1v1h-1zM32 11h1v1h-1zM3 12h1v1h-1zM7 12h1v1h-1zM8 12h1v1h-1zM9 12h1v1h-1zM12 12h1v1h-1zM13 12h1v1h-1zM17 12h1v1h-1zM20 12h1v1h-1zM22 12h1v1h-1zM23 12h1v1h-1zM24 12h1v1h-1zM26 12h1v1h-1zM30 12h1v1h-1zM32 12h1v1h-1zM33 12h1v1h-1zM3 13h1v1h-1zM6 13h1v1h-1zM11 13h1v1h-1zM13 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1zM17 13h1v1h-1zM18 13h1v1h-1zM21 13h1v1h-1zM22 13h1v1h-1zM24 13h1v1h-1zM25 13h1v1h-1zM28 13h1v1h-1zM29 13h1v1h-1zM30 13h1v1h-1zM31 13h1v1h-1zM32 13h1v1h-1zM33 13h1v1h-1zM4 14h1v1h-1zM7 14h1v1h-1zM8 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM20 14h1v1h-1zM21 14h1v1h-1zM22 14h1v1h-1zM26 14h1v1h-1zM28 14h1v1h-1zM30 14h1v1h-1zM34 14h1v1h-1zM4 15h1v1h-1zM5 15h1v1h-1zM6 15h1v1h-1zM12 15h1v1h-1zM16 15h1v1h-1zM18 15h1v1h-1zM19 15h1v1h-1zM22 15h1v1h-1zM23 15h1v1h-1zM25 15h1v1h-1zM28 15h1v1h-1zM29 15h1v1h-1zM32 15h1v1h-1zM33 15h1v1h-1zM34 15h1v1h-1zM2 16h1v1h-1zM6 16h1v1h-1zM7 16h1v1h-1zM8 16h1v1h-1zM9 16h1v1h-1zM11 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM16 16h1v1h-1zM21 16h1v1h-1zM23 16h1v1h-1zM26 16h1v1h-1zM27 16h1v1h-1zM28 16h1v1h-1zM30 16h1v1h-1zM33 16h1v1h-1zM2 17h1v1h-1zM3 17h1v1h-1zM5 17h1v1h-1zM9 17h1v1h-1zM10 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM20 17h1v1h-1zM21 17h1v1h-1zM27 17h1v1h-1zM29 17h1v1h-1zM32 17h1v1h-1zM34 17h1v1h-1zM2 18h1v1h-1zM5 18h1v1h-1zM6 18h1v1h-1zM7 18h1v1h-1zM8 18h1v1h-1zM9 18h1v1h-1zM11 18h1v1h-1zM14 18h1v1h-1zM15 18h1v1h-1zM16 18h1v1h-1zM19 18h1v1h-1zM21 18h1v1h-1zM22 18h1v1h-1zM24 18h1v1h-1zM25 18h1v1h-1zM26 18h1v1h-1zM27 18h1v1h-1zM29 18h1v1h-1zM30 18h1v1h-1zM34 18h1v1h-1zM5 19h1v1h-1zM9 19h1v1h-1zM10 19h1v1h-1zM13 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM19 19h1v1h-1zM20 19h1v1h-1zM21 19h1v1h-1zM22 19h1v1h-1zM23 19h1v1h-1zM24 19h1v1h-1zM25 19h1v1h-1zM27 19h1v1h-1zM28 19h1v1h-1zM31 19h1v1h-1zM32 19h1v1h-1zM33 19h1v1h-1zM34 19h1v1h-1zM5 20h1v1h-1zM6 20h1v1h-1zM7 20h1v1h-1zM8 20h1v1h-1zM9 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM21 20h1v1h-1zM23 20h1v1h-1zM25 20h1v1h-1zM27 20h1v1h-1zM28 20h1v1h-1zM29 20h1v1h-1zM31 20h1v1h-1zM32 20h1v1h-1zM34 20h1v1h-1zM2 21h1v1h-1zM3 21h1v1h-1zM5 21h1v1h-1zM6 21h1v1h-1zM9 21h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM14 21h1v1h-1zM15 21h1v1h-1zM17 21h1v1h-1zM18 21h1v1h-1zM19 21h1v1h-1zM20 21h1v1h-1zM21 21h1v1h-1zM26 21h1v1h-1zM27 21h1v1h-1zM30 21h1v1h-1zM31 21h1v1h-1zM32 21h1v1h-1zM2 22h1v1h-1zM4 22h1v1h-1zM6 22h1v1h-1zM7 22h1v1h-1zM8 22h1v1h-1zM9 22h1v1h-1zM10 22h1v1h-1zM11 22h1v1h-1zM14 22h1v1h-1zM15 22h1v1h-1zM17 22h1v1h-1zM18 22h1v1h-1zM24 22h1v1h-1zM26 22h1v1h-1zM27 22h1v1h-1zM29 22h1v1h-1zM30 22h1v1h-1zM31 22h1v1h-1zM34 22h1v1h-1zM2 23h1v1h-1zM3 23h1v1h-1zM4 23h1v1h-1zM5 23h1v1h-1zM6 23h1v1h-1zM7 23h1v1h-1zM11 23h1v1h-1zM12 23h1v1h-1zM13 23h1v1h-1zM14 23h1v1h-1zM15 23h1v1h-1zM16 23h1v1h-1zM18 23h1v1h-1zM20 23h1v1h-1zM22 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM30 23h1v1h-1zM31 23h1v1h-1zM2 24h1v1h-1zM4 24h1v1h-1zM5 24h1v1h-1zM7 24h1v1h-1zM8 24h1v1h-1zM10 24h1v1h-1zM13 24h1v1h-1zM14 24h1v1h-1zM15 24h1v1h-1zM16 24h1v1h-1zM17 24h1v1h-1zM18 24h1v1h-1zM22 24h1v1h-1zM24 24h1v1h-1zM26 24h1v1h-1zM30 24h1v1h-1zM33 24h1v1h-1zM2 25h1v1h-1zM7 25h1v1h-1zM9 25h1v1h-1zM13 25h1v1h-1zM14 25h1v1h-1zM15 25h1v1h-1zM16 25h1v1h-1zM21 25h1v1h-1zM22 25h1v1h-1zM24 25h1v1h-1zM25 25h1v1h-1zM27 25h1v1h-1zM28 25h1v1h-1zM29 25h1v1h-1zM30 25h1v1h-1zM31 25h1v1h-1zM32 25h1v1h-1zM34 25h1v1h-1zM2 26h1v1h-1zM3 26h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM9 26h1v1h-1zM10 26h1v1h-1zM11 26h1v1h-1zM14 26h1v1h-1zM17 26h1v1h-1zM18 26h1v1h-1zM26 26h1v1h-1zM27 26h1v1h-1zM28 26h1v1h-1zM29 26h1v1h-1zM30 26h1v1h-1zM31 26h1v1h-1zM33 26h1v1h-1zM34 26h1v1h-1zM10 27h1v1h-1zM11 27h1v1h-1zM12 27h1v1h-1zM13 27h1v1h-1zM15 27h1v1h-1zM16 27h1v1h-1zM17 27h1v1h-1zM18 27h1v1h-1zM20 27h1v1h-1zM21 27h1v1h-1zM22 27h1v1h-1zM26 27h1v1h-1zM30 27h1v1h-1zM32 27h1v1h-1zM34 27h1v1h-1zM2 28h1v1h-1zM3 28h1v1h-1zM4 28h1v1h-1zM5 28h1v1h-1zM6 28h1v1h-1zM7 28h1v1h-1zM8 28h1v1h-1zM12 28h1v1h-1zM14 28h1v1h-1zM15 28h1v1h-1zM17 28h1v1h-1zM20 28h1v1h-1zM22 28h1v1h-1zM23 28h1v1h-1zM25 28h1v1h-1zM26 28h1v1h-1zM28 28h1v1h-1zM30 28h1v1h-1zM32 28h1v1h-1zM33 28h1v1h-1zM2 29h1v1h-1zM8 29h1v1h-1zM12 29h1v1h-1zM13 29h1v1h-1zM17 29h1v1h-1zM21 29h1v1h-1zM25 29h1v1h-1zM26 29h1v1h-1zM30 29h1v1h-1zM31 29h1v1h-1zM32 29h1v1h-1zM34 29h1v1h-1zM2 30h1v1h-1zM4 30h1v1h-1zM5 30h1v1h-1zM6 30h1v1h-1zM8 30h1v1h-1zM20 30h1v1h-1zM21 30h1v1h-1zM24 30h1v1h-1zM26 30h1v1h-1zM27 30h1v1h-1zM28 30h1v1h-1zM29 30h1v1h-1zM30 30h1v1h-1zM31 30h1v1h-1zM33 30h1v1h-1zM2 31h1v1h-1zM4 31h1v1h-1zM5 31h1v1h-1zM6 31h1v1h-1zM8 31h1v1h-1zM12 31h1v1h-1zM18 31h1v1h-1zM19 31h1v1h-1zM21 31h1v1h-1zM23 31h1v1h-1zM26 31h1v1h-1zM27 31h1v1h-1zM29 31h1v1h-1zM30 31h1v1h-1zM33 31h1v1h-1zM34 31h1v1h-1zM2 32h1v1h-1zM4 32h1v1h-1zM5 32h1v1h-1zM6 32h1v1h-1zM8 32h1v1h-1zM11 32h1v1h-1zM12 32h1v1h-1zM13 32h1v1h-1zM16 32h1v1h-1zM18 32h1v1h-1zM21 32h1v1h-1zM22 32h1v1h-1zM26 32h1v1h-1zM29 32h1v1h-1zM30 32h1v1h-1zM32 32h1v1h-1zM33 32h1v1h-1zM34 32h1v1h-1zM2 33h1v1h-1zM8 33h1v1h-1zM12 33h1v1h-1zM13 33h1v1h-1zM15 33h1v1h-1zM17 33h1v1h-1zM18 33h1v1h-1zM21 33h1v1h-1zM24 33h1v1h-1zM28 33h1v1h-1zM29 33h1v1h-1zM30 33h1v1h-1zM31 33h1v1h-1zM32 33h1v1h-1zM2 34h1v1h-1zM3 34h1v1h-1zM4 34h1v1h-1zM5 34h1v1h-1zM6 34h1v1h-1zM7 34h1v1h-1zM8 34h1v1h-1zM10 34h1v1h-1zM11 34h1v1h-1zM13 34h1v1h-1zM16 34h1v1h-1zM19 34h1v1h-1zM24 34h1v1h-1zM25 34h1v1h-1zM26 34h1v1h-1zM27 34h1v1h-1zM29 34h1v1h-1zM33 34h1v1h-1z";
+let locations=loadLoc();
+let cache=loadCache();
+let bin=loadBin();
+function loadLoc(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch{return[]}}
+function saveLoc_(){localStorage.setItem(KEY,JSON.stringify(locations))}
+function loadCache(){try{return JSON.parse(localStorage.getItem(CACHEKEY))||{}}catch{return{}}}
+function saveCache(){localStorage.setItem(CACHEKEY,JSON.stringify(cache))}
+function loadBin(){try{return JSON.parse(localStorage.getItem(BINKEY))||[]}catch{return[]}}
+function saveBin(){localStorage.setItem(BINKEY,JSON.stringify(bin))}
+
+/* ---- RainLog Lab: seed all WeatherNext family farms on first run ----
+   Format: ["EN 中文", lat, lng, "Region"]. 114 entries (106 unique + 8 intentional
+   cross-build overlaps). Note RainLog uses `lng` (not `lon`). */
+const SEED_FARMS = [
+  ["Sg. Ruan - Fang Goo 双溪兰 - 晓方",3.77883,101.94133,"Raub 劳勿"],
+  ["Sg. Klau - Fang Goo 双溪吉流 - 晓方",3.71967,102.01033,"Raub 劳勿"],
+  ["Sg. Klau 1 - CT Tan 双溪吉流 1 - CT Tan",3.717,102.0055,"Raub 劳勿"],
+  ["Kg. Sg. Ruan - Neng 双溪兰 - 能",3.79361,101.93472,"Raub 劳勿"],
+  ["Kg. Sg. Ruan - Jerry Phoon 双溪兰新村 - Jerry",3.79194,101.94278,"Raub 劳勿"],
+  ["Sg. Klau - Kwong Seng 双溪吉流 - Kwong Seng",3.74833,101.95133,"Raub 劳勿"],
+  ["Sg. Klau 2 - CT Tan 双溪吉流 2 - CT Tan",3.74417,101.96917,"Raub 劳勿"],
+  ["Kg. Sg. Klau - Thompson 双溪吉流新村 - Thompso",3.7475,101.97694,"Raub 劳勿"],
+  ["Kg. Sg. Klau - Soon 双溪吉流新村 - 顺",3.78392,101.98063,"Raub 劳勿"],
+  ["Kampung Temau - Eric 甘榜德茂 - Eric",3.929,101.921,"Raub 劳勿"],
+  ["Ulu Gali 乌鲁加里",3.84478,101.95747,"Raub 劳勿"],
+  ["Kg. Gali 甘榜加里",3.83333,101.9,"Raub 劳勿"],
+  ["Jerkoh 日利谷",4.04861,101.92028,"Raub 劳勿"],
+  ["SJKC Cheroh 积罗国民型华文学校",3.90293,101.81499,"Raub 劳勿"],
+  ["Kampung Temau - MK 甘榜德茂 - MK",3.917778,101.919444,"Raub 劳勿"],
+  ["Dong - Hong 东区 - 鸿总",4.090556,101.966111,"Raub 劳勿"],
+  ["Ulu Gali - Jacky Kuan 乌鲁加里 - Jacky Kuan",3.834694,101.911833,"Raub 劳勿"],
+  ["Raub Batu Tiga - James Lye 劳勿三英里 - James",3.79275,101.903889,"Raub 劳勿"],
+  ["Ringlet 冷力",4.41453,101.38415,"Cameron 金马仑"],
+  ["Bertam Valley 伯坦谷",4.397,101.381,"Cameron 金马仑"],
+  ["Habu 哈布",4.44011,101.38921,"Cameron 金马仑"],
+  ["Tanah Rata 丹那拉打",4.47135,101.37565,"Cameron 金马仑"],
+  ["Brinchang 碧兰璋",4.49223,101.38732,"Cameron 金马仑"],
+  ["Kea Farm 吉亚农场",4.50436,101.40734,"Cameron 金马仑"],
+  ["Tringkap 丁甲",4.51494,101.42771,"Cameron 金马仑"],
+  ["Kampung Raja 甘榜拉惹",4.56709,101.40968,"Cameron 金马仑"],
+  ["Blue Valley 蓝谷",4.58322,101.41243,"Cameron 金马仑"],
+  ["Sungai Palas 双溪巴拉斯",4.5225,101.367,"Cameron 金马仑"],
+  ["Cameron Valley 金马伦谷",4.4305,101.401,"Cameron 金马仑"],
+  ["Boh Tea Plantation BOH 茶园",4.52,101.37,"Cameron 金马仑"],
+  ["Kuala Terla Tea Estate 吉拉烈茶园",4.548,101.42,"Cameron 金马仑"],
+  ["Kampung Taman Sedia 草莓农场",4.458,101.384,"Cameron 金马仑"],
+  ["MARDI Cameron Highlands MARDI 农业站",4.4619,101.3838,"Cameron 金马仑"],
+  ["Mantin Tmn Permai Jaya 文丁 中华华文小学",2.81778,101.8925,"NS9 森美兰"],
+  ["Mantin Andalas GIO GIO 文丁 湖滨花园",2.82639,101.88028,"NS9 森美兰"],
+  ["MANTIN DALAM 文丁达南",2.806111,101.8875,"NS9 森美兰"],
+  ["Spg. Durian (Kg. Mentaus) 1 新邦榴莲 Pitt-猫王",3.12,102.21972,"NS9 森美兰"],
+  ["Spg. Durian (Kg. Mentaus) 2 新邦榴莲 SAM",3.11778,102.21944,"NS9 森美兰"],
+  ["Titi 知知港",2.8167,102.0667,"NS9 森美兰"],
+  ["Labis - Austin 拉美士 - Austin",2.42806,103.03639,"Johor 柔佛"],
+  ["Segamat Buloh Kasap 昔加末 巫罗加什",2.527677,102.772178,"Johor 柔佛"],
+  ["Chaah Baru 三合港",2.148561,103.052319,"Johor 柔佛"],
+  ["Bekok 彼咯",2.305833,103.091389,"Johor 柔佛"],
+  ["Jementah 利民达",2.433331,102.683331,"Johor 柔佛"],
+  ["Tenang Hot Spring 丁能 热水池",2.481236,103.05805,"Johor 柔佛"],
+  ["Machap Baru 马接峇鲁",2.38,102.35056,"Melaka 马六甲"],
+  ["Durian Tunggal Dam 榴梿洞葛水坝",2.3537,102.3161,"Melaka 马六甲"],
+  ["Kg. Simpang Tebing Tinggi 德宾丁宜新村",3.87467,102.34467,"Jerantut 而连突"],
+  ["Damak 达玛",3.949544,102.214385,"Jerantut 而连突"],
+  ["Bukit Seladang 友联港神山",3.91313,102.35476,"Jerantut 而连突"],
+  ["Bentong Kuala Repas 文冬兵营",3.55181,101.8852,"Bentong 文冬"],
+  ["Bentong Happy Farm 农家乐",3.53333,101.88444,"Bentong 文冬"],
+  ["Bentong Valley Agro Park 文冬山寨谷小舍",3.67438,101.8655,"Bentong 文冬"],
+  ["Bentong Utara 文冬市北",3.52816,101.915014,"Bentong 文冬"],
+  ["Bentong Bukit D.O 文冬老虎山",3.530986,101.910808,"Bentong 文冬"],
+  ["Bentong Selatan 文冬市南",3.516833,101.897667,"Bentong 文冬"],
+  ["Waterway Villa 水道别墅",3.44917,101.90056,"Bentong 文冬"],
+  ["Kg. Benus 甘榜本努斯",3.50783,101.92667,"Bentong 文冬"],
+  ["Tras 都赖",3.73622,101.80792,"Bentong 文冬"],
+  ["Kampung Hulu Lebu 乌鲁乐布新村",3.57278,101.92611,"Bentong 文冬"],
+  ["Kampung Lebu 甘榜乐布",3.616,101.933,"Bentong 文冬"],
+  ["Sungai Ruan 双溪兰",3.8542814,101.9430543,"Bentong Team 团队"],
+  ["Bentong Kuala Repas 文冬兵营",3.55181,101.8852,"Bentong Team 团队"],
+  ["Bentong Happy Farm 农家乐",3.53333,101.88444,"Bentong Team 团队"],
+  ["Bentong Valley Agro Park 文冬山寨谷小舍",3.67438,101.8655,"Bentong Team 团队"],
+  ["Bentong Utara 文冬市北",3.52816,101.915014,"Bentong Team 团队"],
+  ["Bentong Bukit D.O 文冬老虎山",3.530986,101.910808,"Bentong Team 团队"],
+  ["Bentong Selatan 文冬市南",3.516833,101.897667,"Bentong Team 团队"],
+  ["Borneo Spring 婆罗青泉",3.492,102.024,"Karak 加叻"],
+  ["Kg. Sungai Dua 甘榜双溪都亚",3.45972,102.0,"Karak 加叻"],
+  ["Kg. Cinta Manis 甘甜新村",3.453,102.031,"Karak 加叻"],
+  ["Kg. Troh 德乐新村",3.41194,102.07889,"Karak 加叻"],
+  ["The Valley 加叻幽谷",3.38389,102.02778,"Karak 加叻"],
+  ["100% ORGANIC DURI RIN 山本绫有机农场",3.45227,101.99607,"Karak 加叻"],
+  ["Manchis 文积",3.205,102.164,"Manchis 文积"],
+  ["Kg. Ponson - Gan Ming Keong 彭顺村 - 颜明强",3.229722,102.156111,"Manchis 文积"],
+  ["Batu 36 三十六碑",3.240556,102.141111,"Manchis 文积"],
+  ["Chenderiang 积莪营",4.256043,101.227729,"Perak 霹雳"],
+  ["Sungkai 宋溪",3.978889,101.360278,"Perak 霹雳"],
+  ["Diamond Creeks 钻石溪",3.7755,101.52567,"Perak 霹雳"],
+  ["Tanjung Malim 丹绒马林",3.71778,101.55278,"Perak 霹雳"],
+  ["Kampung Belengu 甘榜柏伦古",3.436161,102.294602,"Pahang Central 彭亨中部"],
+  ["Kampung Ketam 甘榜吉胆",3.54,102.36778,"Pahang Central 彭亨中部"],
+  ["Kampung Gantok 甘榜甘督",3.505847,102.360318,"Pahang Central 彭亨中部"],
+  ["Jambu Rias BIGWOOD 占布里亚斯 大木",3.467919,102.094837,"Pahang Central 彭亨中部"],
+  ["Lojing 罗京高原",4.7443608,101.6416756,"Kelantan 吉兰丹"],
+  ["Kuala Krai 瓜拉吉赖",5.456499,102.3308,"Kelantan 吉兰丹"],
+  ["Gua Musang 话望生",4.884279,101.968178,"Kelantan 吉兰丹"],
+  ["Lubok Palaei 鲁柏巴莱",2.430879,111.947151,"Sabah/Sarawak 东马"],
+  ["Sibintek 西宾德",2.33837,112.08403,"Sabah/Sarawak 东马"],
+  ["Keningau 根地咬",5.35528,116.14472,"Sabah/Sarawak 东马"],
+  ["Kionsom 建山",5.99417,116.18222,"Sabah/Sarawak 东马"],
+  ["Mengkarak 明加叻",3.32,102.43,"Bera 百乐县"],
+  ["Kemasul 金马苏",3.297,102.395,"Bera 百乐县"],
+  ["Triang 直凉",3.248,102.417,"Bera 百乐县"],
+  ["Palm Glove 直凉园 金河山庄",3.2305389,102.3951267,"Bera 百乐县"],
+  ["Paya Lang 巴也郎",3.18194,102.43667,"Bera 百乐县"],
+  ["Simpang Bukit Mendi 明光",3.165721,102.386012,"Bera 百乐县"],
+  ["Bukit Mendi 武吉文迪",3.17474,102.350563,"Bera 百乐县"],
+  ["Kemayan Taman Maju Jaya 金马扬 1",3.124265,102.363199,"Bera 百乐县"],
+  ["Kemayan Taman Ixnora Jaya 金马扬 2",3.141841,102.363953,"Bera 百乐县"],
+  ["Sungai Rui 双溪锐",3.09639,102.35861,"Bera 百乐县"],
+  ["Lanchang (Durian) 联增",3.42925,102.13928,"Miketam 苏晓薇"],
+  ["Draha (Durian) 德拉哈",3.40339,102.283,"Miketam 苏晓薇"],
+  ["Jambu Rias 占布里亚斯",3.39956,102.14848,"Miketam 苏晓薇"],
+  ["Empresa 皇后园",3.36379,102.2608,"Miketam 苏晓薇"],
+  ["Mentakab 文德甲",3.37169,102.31093,"Miketam 苏晓薇"],
+  ["Mengkarak 明加叻",3.32936,102.31455,"Miketam 苏晓薇"],
+  ["Kuala Lipis 瓜拉立卑",4.124748,102.088034,"Miketam 苏晓薇"],
+  ["Kampung Chapu 甘榜查布",5.1775,102.895,"Desmond 陈联铕"],
+  ["Kuala Berang 瓜拉伯浪",5.1725,102.53333,"Desmond 陈联铕"],
+  ["Sungkai 宋溪",3.978889,101.360278,"Desmond 陈联铕"],
+  ["Tanjung Malim 丹绒马林",3.71778,101.55278,"Uncle Soon 順豪"],
+  ["Sungai Lembing 林明",3.85,103.03333,"Uncle Soon 順豪"],
+];
+const SEED_VERSION = 5;
+const SEED_FLAG = NS+".seeded";
+const SEED_VER_KEY = NS+".seedVersion";
+const REGION_RENAMES = { "Jerantut":"Jerantut 而连突", "Miketam":"Miketam 苏晓薇" };
+
+(function seedFarms(){
+  const seeded = localStorage.getItem(SEED_FLAG)==="1";
+  const ver = parseInt(localStorage.getItem(SEED_VER_KEY)||"0",10);
+  if(!seeded && locations.length===0){
+    locations = SEED_FARMS.map(([name,lat,lng,region],i)=>({
+      id:"L"+Date.now().toString(36)+i.toString(36), name, lat, lng, region
+    }));
+    localStorage.setItem(SEED_FLAG,"1");
+    localStorage.setItem(SEED_VER_KEY,String(SEED_VERSION));
+    saveLoc_();
+  } else if(seeded && ver < SEED_VERSION){
+    // rename outdated region labels first (avoids creating duplicates)
+    for(const loc of locations){
+      if(loc.region && REGION_RENAMES[loc.region]) loc.region = REGION_RENAMES[loc.region];
+    }
+    // back-fill region onto farms lacking it (match by coordinate)
+    for(const loc of locations){
+      if(loc.region) continue;
+      const hit = SEED_FARMS.find(([n,la,lo])=>
+        Math.abs(la-(+loc.lat))<1e-4 && Math.abs(lo-(+(loc.lng??loc.lon)))<1e-4);
+      if(hit) loc.region = hit[3];
+    }
+    // add any (name+region) seed entry not present
+    const have = new Set(locations.map(l=>`${l.name}@@${l.region||""}`));
+    SEED_FARMS.forEach(([name,lat,lng,region],i)=>{
+      if(!have.has(`${name}@@${region}`)){
+        locations.push({ id:"Lm"+Date.now().toString(36)+i.toString(36), name, lat, lng, region });
+        have.add(`${name}@@${region}`);
+      }
+    });
+    localStorage.setItem(SEED_VER_KEY,String(SEED_VERSION));
+    saveLoc_();
+  }
+})();
+const T={
+  zh:{
+    title:"RainLog Lab", sub:"近 3 个月雨量 · 实验版",
+    attrib:"数据来源：Open-Meteo",
+    shCur:"当前连旱", shHot:"其中达 30°C", shNone:"目前没有连旱（昨天有雨）", shHist:"最长连旱", shFlower:"🌸 诱花时机参考", shDayUnit:"天",
+    add:"添加", sheetTitle:"添加地点", sheetDesc:"为地点命名，然后输入坐标或使用 GPS 定位。",
+    lName:"地点名称 / NAME", lCoords:"坐标 纬度 / 经度", gps:"使用我的 GPS 定位",
+    cancel:"取消", save:"保存",
+    emptyT:"还没有地点", filterPlaceholder:"搜索果园名…", noMatch:"没有符合的果园", ungrouped:"其他", emptyD:"点击右上角的「＋ 添加」按钮，开始记录雨量。",
+    get:"查询雨量", reget:"重新查询", xls:"导出 Excel",
+    total:"总降雨量", rainy:"有雨天数", daysTotal:"总天数", daysCovered:"涵盖天数", daysMissing:"缺失天数",
+    threshLabel:"有雨天数标准", threshOfficial:"官方", threshOfficialSub:"≥1mm", threshUseful:"有效雨", threshUsefulSub:"≥2.5mm",
+    loading:"查询中…", loaded:n=>`已更新 · ${n} 天数据`, cached:"已保存的数据 · 可重新查询更新",
+    errFetch:"查询失败，请检查网络后重试。",
+    needName:"请输入地点名称。", needCoords:"请输入有效坐标。",
+    gpsWait:"正在定位…", gpsOk:"定位成功 ✓", gpsFail:"无法获取定位，请手动输入。", gpsNo:"此设备不支持 GPS。",
+    confirmDel:n=>`删除「${n}」？`, xlNoData:"请先查询雨量再导出。",
+    share:"分享", edit:"编辑", del:"删除",
+    editTitle:"编辑地点", editDesc:"修改名称或重新定位坐标。",
+    binTitle:"回收站", binDesc:"还原已删除的地点，或永久删除。", binEmpty:"回收站是空的", restore:"还原", purge:"永久删除",
+    recycleTab:"回收站", backToAdd:"返回添加",
+    confirmPurge:n=>`永久删除「${n}」？此操作无法复原。`,
+    colDate:"日期", colWeek:"星期", colMM:"降雨量 (mm)", colDT:"Delta-T (°C)", colTMax:"最高气温 (°C)",
+    sumLabel:"汇总", sheetName:"每日雨量",
+    last14:"近 14 天", maxLabel:n=>`最高 ${n} mm`, byMonth:"按月统计", monthSheet:"按月汇总",
+    dryTitle:"连续干旱（诱花参考）", dryCurrent:"当前连旱", dryLongest:"最长连旱", dayUnit:"天",
+    dtTitle:"Delta-T 趋势", dtTitleSub:"（近14天 · 中午12–3点）", dtLatest:"最新", dtAbbr:"ΔT", dtTempAbbr:"高温", dtLegendDT:"Delta-T", dtLegendTemp:"最高气温", dtRef:"参考：2–8 适宜喷药，8–10 临界，>10 蒸发过快，<2 太潮湿。红色虚线为 ΔT 10：高过此线那天喷药可能失效。绿色虚线为 30°C：达到或高于此线、配合干旱，有助花芽分化。此为历史记录，非实时建议。",
+    partialNote:"* 该月数据不完整（仅部分日期）。",
+    colMonth:"月份", colMonthMM:"月降雨量 (mm)", colMonthDays:"有雨天数",
+    monthNames:["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"],
+    week:["周日","周一","周二","周三","周四","周五","周六"],
+    guideTitle:"使用说明",
+    guide:{
+      intro:"雨量记录帮你查看果园近三个月的雨量历史，辅助榴莲管理。所有数据来自 Open-Meteo，查询后会保存在手机上，离线也能查看。",
+      qrTitle:"分享这个应用",
+      qrSub:"让朋友扫一扫，即可打开雨量记录。",
+      foot:"数据来源：Open-Meteo（ERA5 网格数据，为大范围参考值，与果园实测雨量可能略有差异）。本应用仅提供历史记录，不作实时农事建议。",
+      sections:[
+        {icon:"➕",bg:"#dbeafe",fg:"#1d4ed8",h:"添加果园",
+         p:"点右上角的 <b>＋</b>，输入果园名称，再手动填入坐标或点「使用我的 GPS 定位」自动获取。保存后果园会显示在主页。"},
+        {icon:"🌧️",bg:"#dbeafe",fg:"#1d4ed8",h:"查询雨量",
+         p:"在果园卡片上点蓝色的 <b>查询雨量</b>。应用会取回近三个月加本月到昨天的每日雨量。查询一次后数据已保存，下次打开无需重新查询；想更新时再点「重新查询」即可。"},
+        {icon:"📊",bg:"#ecfdf5",fg:"#047857",h:"总降雨量与有雨天数",
+         p:"卡片顶部显示这段期间的总降雨量，以及有雨天数。有雨天数取决于下方的「有雨天数标准」。"},
+        {icon:"🌦️",bg:"#dbeafe",fg:"#1d4ed8",h:"两种有雨天数标准",
+         p:"顶部的<b>有雨天数标准</b>可切换两种算法：<br><b>官方 ≥1mm（WMO）</b> — 世界气象组织（WMO）的标准，当天降雨达 1 毫米以上即算一个雨天，常用于官方气象统计。<br><b>有效雨 ≥2.5mm</b> — 农业角度，只算真正湿透土壤、对果树有用的雨；零星小雨不计。<br>多数果农用「有效雨」更贴近田间实际感受。切换即时生效，不需重新查询，也会同时影响下方的连旱判定。"},
+        {icon:"🌥️",bg:"#fff7ed",fg:"#c2410c",h:"连续干旱（诱花参考）",
+         p:"显示三个月内<b>最长连旱</b>及<b>当前连旱</b>天数和日期。榴莲诱花需要一段干旱期，连旱天数可帮你判断诱花时机。干旱判定跟随上面的有雨标准。"},
+        {icon:"📈",bg:"#eef2ff",fg:"#4f46e5",h:"Delta-T 趋势",
+         p:"近 14 天每日中午 12–3 点的最高 Delta-T。Delta-T 反映空气蒸发强度，用来回看过去哪几天<b>适合喷药</b>。参考：2–8 适宜，8–10 临界，>10 太干蒸发快，<2 太潮湿。仅为历史记录。"},
+        {icon:"👆",bg:"#f1f5f9",fg:"#475569",h:"卡片操作",
+         p:"在果园卡片上<b>向左滑动</b>、点右上角的 <b>⋯</b>、或电脑上<b>右键点击</b>，可显示 分享 / 编辑 / 删除。删除的果园会进入回收站，可还原或永久删除。"},
+        {icon:"📤",bg:"#ecfdf5",fg:"#047857",h:"导出与分享",
+         p:"点 <b>导出 Excel</b> 把每日雨量、Delta-T 和按月汇总存成表格。<b>分享</b>会把整张卡片截成图片，通过手机分享菜单发到 WhatsApp 等。"}
+      ]
+    }
+  },
+  en:{
+    title:"RainLog Lab", sub:"LAST 3 MONTHS · LAB",
+    attrib:"Data: Open-Meteo",
+    shCur:"Current dry streak", shHot:"of which ≥30°C", shNone:"No dry streak right now (rain yesterday)", shHist:"Longest dry spell", shFlower:"🌸 Flower-induction window", shDayUnit:"d",
+    add:"Add", sheetTitle:"Add location", sheetDesc:"Name the spot, then enter coordinates or use GPS.",
+    lName:"LOCATION NAME / 名称", lCoords:"COORDINATES LAT / LNG", gps:"Use my GPS location",
+    cancel:"Cancel", save:"Save",
+    emptyT:"No locations yet", filterPlaceholder:"Search orchards…", noMatch:"No matching orchards", ungrouped:"Other", emptyD:"Tap the “＋ Add” button in the top-right to start logging rainfall.",
+    get:"Get rainfall", reget:"Refresh", xls:"Export Excel",
+    total:"Total rainfall", rainy:"Rainy days", daysTotal:"Total days", daysCovered:"Days covered", daysMissing:"Days missing",
+    threshLabel:"Rainy-day basis", threshOfficial:"Official", threshOfficialSub:"≥1mm", threshUseful:"Useful", threshUsefulSub:"≥2.5mm",
+    loading:"Loading…", loaded:n=>`Updated · ${n} days`, cached:"Saved data · refresh to update",
+    errFetch:"Fetch failed. Check your connection and retry.",
+    needName:"Please enter a location name.", needCoords:"Please enter valid coordinates.",
+    gpsWait:"Locating…", gpsOk:"Located ✓", gpsFail:"Couldn't locate. Enter manually.", gpsNo:"GPS not supported.",
+    confirmDel:n=>`Delete “${n}”?`, xlNoData:"Get rainfall data first.",
+    share:"Share", edit:"Edit", del:"Delete",
+    editTitle:"Edit location", editDesc:"Change the name or re-pin the coordinates.",
+    binTitle:"Recycle bin", binDesc:"Restore deleted locations, or remove them for good.", binEmpty:"Recycle bin is empty", restore:"Restore", purge:"Delete forever",
+    recycleTab:"Recycle bin", backToAdd:"Back to add",
+    confirmPurge:n=>`Permanently delete “${n}”? This cannot be undone.`,
+    colDate:"Date", colWeek:"Day", colMM:"Rainfall (mm)", colDT:"Delta-T (°C)", colTMax:"High temp (°C)",
+    sumLabel:"Summary", sheetName:"Daily_rainfall",
+    last14:"Last 14 days", maxLabel:n=>`max ${n} mm`, byMonth:"By month", monthSheet:"By_month",
+    dryTitle:"Dry spell (flowering signal)", dryCurrent:"Current dry streak", dryLongest:"Longest dry spell", dayUnit:"d",
+    dtTitle:"Delta-T trend", dtTitleSub:"(last 14d · midday 12–3pm)", dtLatest:"latest", dtAbbr:"ΔT", dtTempAbbr:"high", dtLegendDT:"Delta-T", dtLegendTemp:"High temp", dtRef:"Reference: 2–8 good to spray, 8–10 marginal, >10 too evaporative, <2 too humid. Red dashed line = ΔT 10: days above it, your spray may not work. Green dashed line = 30°C: days at or above it, paired with a dry spell, help flower induction. Historical record, not live advice.",
+    partialNote:"* Partial month (only some days available).",
+    colMonth:"Month", colMonthMM:"Monthly rainfall (mm)", colMonthDays:"Rainy days",
+    monthNames:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+    week:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
+    guideTitle:"User Guide",
+    guide:{
+      intro:"RainLog shows your orchard's rainfall history for the past three months to support durian management. All data comes from Open-Meteo and is saved on your phone after fetching, so it works offline too.",
+      qrTitle:"Share this app",
+      qrSub:"Let a friend scan to open RainLog.",
+      foot:"Data: Open-Meteo (ERA5 gridded data — an area-wide reference that may differ slightly from your on-site gauge). This app is a historical record only, not live agronomic advice.",
+      sections:[
+        {icon:"➕",bg:"#dbeafe",fg:"#1d4ed8",h:"Add an orchard",
+         p:"Tap <b>＋</b> at the top right, enter a name, then type the coordinates or tap “Use my GPS location”. Saved orchards appear on the home screen."},
+        {icon:"🌧️",bg:"#dbeafe",fg:"#1d4ed8",h:"Get rainfall",
+         p:"Tap the blue <b>Get rainfall</b> on a card. It fetches daily rainfall for the last three full months plus this month to yesterday. Data is saved, so you needn't re-fetch each time — tap “Refresh” when you want to update."},
+        {icon:"📊",bg:"#ecfdf5",fg:"#047857",h:"Total & rainy days",
+         p:"The top of the card shows total rainfall for the period and the number of rainy days. The rainy-day count depends on the <b>Rainy-day basis</b> below."},
+        {icon:"🌦️",bg:"#dbeafe",fg:"#1d4ed8",h:"Two rainy-day standards",
+         p:"The <b>Rainy-day basis</b> at the top switches between two ways of counting:<br><b>Official ≥1mm (WMO)</b> — the World Meteorological Organization standard; any day with 1mm or more counts as a rainy day. Used in official weather statistics.<br><b>Useful ≥2.5mm</b> — the agricultural view; only rain that truly wets the soil and helps the trees counts, ignoring light drizzle.<br>Most growers find “Useful” matches what they feel in the field. Switching is instant, needs no re-fetch, and also affects the dry-spell count below."},
+        {icon:"🌥️",bg:"#fff7ed",fg:"#c2410c",h:"Dry spell (flowering signal)",
+         p:"Shows the <b>longest</b> and <b>current</b> dry streaks in days, with dates. Durian flowering needs a dry stress period, so the streak count helps you judge induction timing. A “dry day” follows the rainy-day basis above."},
+        {icon:"📈",bg:"#eef2ff",fg:"#4f46e5",h:"Delta-T trend",
+         p:"The daily peak Delta-T (12–3pm) over the last 14 days. Delta-T reflects how evaporative the air is — useful for reviewing which past days were <b>good for spraying</b>. Reference: 2–8 good, 8–10 marginal, >10 too dry, <2 too humid. Historical only."},
+        {icon:"👆",bg:"#f1f5f9",fg:"#475569",h:"Card actions",
+         p:"<b>Swipe left</b>, tap the <b>⋯</b>, or <b>right-click</b> on desktop to reveal Share / Edit / Delete. Deleted orchards go to the recycle bin, where you can restore or permanently delete them."},
+        {icon:"📤",bg:"#ecfdf5",fg:"#047857",h:"Export & share",
+         p:"Tap <b>Export Excel</b> to save daily rainfall, Delta-T and a monthly summary as a spreadsheet. <b>Share</b> captures the whole card as an image and sends it via your phone's share sheet (e.g. WhatsApp)."}
+      ]
+    }
+  }
+};
+function tr(k){return T[lang][k]}
+function applyLang(){
+  document.documentElement.lang=lang;
+  // Button always shows the language the UI is currently in.
+  const lb=document.getElementById("langBtn");
+  if(lb) lb.textContent=LANG_LBL[lang];
+  const s=(id,v)=>{const el=document.getElementById(id); if(el) el.textContent=v;};
+  s("t-title",tr("title")); s("t-attrib",tr("attrib"));
+  s("t-sheet-title",tr("sheetTitle")); s("t-sheet-desc",tr("sheetDesc"));
+  s("t-l-name",tr("lName")); s("t-l-coords",tr("lCoords")); s("t-gps",tr("gps"));
+  s("t-cancel",tr("cancel")); s("t-save",tr("save"));
+  s("t-bin-entry",tr("recycleTab")); s("t-bin-back",tr("backToAdd"));
+  render(); renderBin(); updateBinCount();
+  if(document.getElementById("guideOverlay").classList.contains("on")) renderGuide();
+}
+function toggleLang(){
+  // One tap = switch immediately. The button label always shows the language the
+  // UI is currently in (中 when Chinese, EN when English).
+  const i=LANG_CYCLE.indexOf(lang);
+  lang=LANG_CYCLE[(i+1)%LANG_CYCLE.length];
+  localStorage.setItem(LANGKEY,lang);
+  applyLang();   // re-renders the UI and refreshes the button label
+}
+
+/* ===== user guide ===== */
+function openGuide(){ renderGuide(); document.getElementById("guideOverlay").classList.add("on"); }
+function closeGuide(){ document.getElementById("guideOverlay").classList.remove("on"); }
+function renderGuide(){
+  document.getElementById("t-guide-title").textContent=tr("guideTitle");
+  const G=tr("guide");
+  const sections=G.sections.map(s=>`<div class="g-sec">
+    <div class="g-h"><div class="g-ico" style="background:${s.bg};color:${s.fg}">${s.icon}</div><h3>${s.h}</h3></div>
+    <p>${s.p}</p>
+  </div>`).join("");
+  const qr=`<div class="g-qr">
+    <div class="g-qr-title">${G.qrTitle}</div>
+    <div class="g-qr-box">
+      <svg viewBox="0 0 ${QR_N} ${QR_N}" width="180" height="180" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
+        <rect width="${QR_N}" height="${QR_N}" fill="#ffffff"/>
+        <path d="${QR_PATH}" fill="#1d4ed8"/>
+      </svg>
+    </div>
+    <div class="g-qr-sub">${G.qrSub}</div>
+  </div>`;
+  document.getElementById("guideBody").innerHTML=
+    `<div class="g-intro">${G.intro}</div>${sections}${qr}<div class="g-foot">${G.foot}</div>`;
+}
+let expandedGroups = null;  // Set of expanded region names
+function cardHTML(loc){
+  const c=cache[loc.id];
+  const has=c&&c.days&&c.days.length;
+  let status=""; if(has) status=c.stale?tr("cached"):tr("loaded")(c.days.length);
+  return `<div class="card-wrap" id="wrap-${loc.id}">
+      <div class="card" id="content-${loc.id}"
+        ontouchstart="handleTouchStart(event,'${loc.id}')"
+        ontouchmove="handleTouchMove(event,'${loc.id}')"
+        ontouchend="handleTouchEnd(event,'${loc.id}')"
+        oncontextmenu="handleContextMenu(event,'${loc.id}')">
+      <div class="card-head">
+        <div class="pin">🌧️</div>
+        <div class="card-name-wrap">
+          <div class="card-name">${esc(loc.name)}</div>
+        </div>
+        <button class="grip" onclick="event.stopPropagation(); toggleCardActions('${loc.id}')" aria-label="${tr("share")} / ${tr("edit")} / ${tr("del")}">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        ${has?`<div class="stat-row">
+          <div class="stat rain"><div class="l">${tr("total")}</div><div class="n tabular">${displayTotal(c.days).toFixed(1)}<span class="su">mm</span></div></div>
+          <div class="stat days"><div class="l">${tr("rainy")}</div><div class="n tabular">${rainyCount(c.days)}</div></div>
+        </div>
+        ${dryStreakHTML(c.days)}
+        ${miniChartHTML(c.days)}
+        ${deltaTHTML(c.days)}
+        ${monthRollupHTML(c.days)}`:``}
+        <div class="btn-row">
+          <button class="act act-get" id="ld-${loc.id}" onclick="getRain('${loc.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.6"/><polyline points="21 3 21 9 15 9"/></svg>
+            ${has?tr("reget"):tr("get")}
+          </button>
+          <button class="act act-xls" ${has?"":"disabled"} onclick="exportXLS('${loc.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            ${tr("xls")}
+          </button>
+        </div>
+        <div class="card-status" id="st-${loc.id}">${status}</div>
+      </div>
+      </div>
+      <div class="swipe-actions">
+        <button class="action-btn btn-share" onclick="shareLoc('${loc.id}')" aria-label="${tr("share")}">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+        <button class="action-btn btn-edit" onclick="editLoc('${loc.id}')" aria-label="${tr("edit")}">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+        </button>
+        <button class="action-btn btn-delete" onclick="softDelete('${loc.id}')" aria-label="${tr("del")}">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+        </button>
+      </div>
+    </div>`;
+}
+
+function render(){
+  const list=document.getElementById("locList");
+  const filterEl=document.getElementById("locFilter");
+  if(!locations.length){
+    if(filterEl) filterEl.style.display="none";
+    list.innerHTML=`<div class="empty"><div class="big">🗺️</div><div class="t">${tr("emptyT")}</div><div class="d">${tr("emptyD")}</div></div>`;
+    return;
+  }
+  // filter box appears when the list is long
+  const many = locations.length>12;
+  if(filterEl){
+    filterEl.style.display = many?"block":"none";
+    filterEl.placeholder = tr("filterPlaceholder");
+  }
+  const q=(many && filterEl ? filterEl.value : "").trim().toLowerCase();
+  const filtering=q.length>0;
+  const live = filtering ? locations.filter(l=>l.name.toLowerCase().includes(q)) : locations;
+
+  if(filtering && !live.length){
+    list.innerHTML=`<div class="empty" style="padding:24px"><div class="d">${tr("noMatch")}</div></div>`;
+    renderThreshToggle(); return;
+  }
+  if(!many){
+    list.innerHTML=live.map(cardHTML).join("");
+    renderThreshToggle(); return;
+  }
+
+  // ---- region accordion ----
+  const groups=new Map();
+  for(const loc of live){
+    const g=loc.region||tr("ungrouped");
+    if(!groups.has(g)) groups.set(g,[]);
+    groups.get(g).push(loc);
+  }
+  if(expandedGroups===null) expandedGroups=new Set();
+  let html="";
+  for(const [region,locs] of groups){
+    const open = filtering || expandedGroups.has(region);
+    html+=`<div class="loc-group-h${open?' open':''}" onclick="toggleGroup('${region.replace(/'/g,"\\'")}')">
+        <span class="lg-caret">${open?'▾':'▸'}</span>
+        <span class="lg-name">${esc(region)}</span>
+        <span class="lg-count">${locs.length}</span>
+      </div>`;
+    if(open) html+=`<div class="loc-group-body">${locs.map(cardHTML).join("")}</div>`;
+  }
+  list.innerHTML=html;
+  renderThreshToggle();
+}
+function toggleGroup(region){
+  if(expandedGroups===null) expandedGroups=new Set();
+  if(expandedGroups.has(region)) expandedGroups.delete(region);
+  else expandedGroups.add(region);
+  render();
+}
+/* show toggle only when at least one farm has data; reflect current threshold + language */
+function renderThreshToggle(){
+  const box=document.getElementById("threshToggle");
+  if(!box) return;
+  const anyData=locations.some(l=>cache[l.id]&&cache[l.id].days&&cache[l.id].days.length);
+  box.style.display = anyData ? "" : "none";
+  const o1=document.getElementById("thresh-1"), o25=document.getElementById("thresh-25");
+  if(o1) o1.innerHTML=`${tr("threshOfficial")}<small>${tr("threshOfficialSub")}</small>`;
+  if(o25) o25.innerHTML=`${tr("threshUseful")}<small>${tr("threshUsefulSub")}</small>`;
+  if(o1) o1.classList.toggle("on", RAIN_DAY_MM===1.0);
+  if(o25) o25.classList.toggle("on", RAIN_DAY_MM===2.5);
+  const lab=document.getElementById("t-thresh-label"); if(lab) lab.textContent=tr("threshLabel");
+}
+function setThresh(v){
+  RAIN_DAY_MM=v;
+  localStorage.setItem(THRESHKEY, String(v));
+  render();
+}
+function esc(s){return(s+"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]))}
+
+/* live count of rainy days from cached daily data, using the current threshold */
+function rainyCount(days){
+  return days.filter(d=>d.mm!=null && d.mm>=RAIN_DAY_MM).length;
+}
+
+/* dry-spell analysis: a "dry day" = below the chosen rainy threshold.
+   Returns current ongoing streak (up to the last day) and the longest spell. */
+function drySpells(days){
+  // known days only, in chronological order
+  const seq=days.filter(d=>d.mm!=null);
+  let longest=0, longestEnd=-1, run=0;
+  for(let i=0;i<seq.length;i++){
+    if(seq[i].mm<RAIN_DAY_MM){ run++; if(run>longest){longest=run; longestEnd=i;} }
+    else run=0;
+  }
+  // current streak = dry days at the very end of the sequence
+  let cur=0;
+  for(let i=seq.length-1;i>=0;i--){ if(seq[i].mm<RAIN_DAY_MM) cur++; else break; }
+  let longestRange=null;
+  if(longest>0 && longestEnd>=0){
+    longestRange={start:seq[longestEnd-longest+1].date, end:seq[longestEnd].date};
+  }
+  let currentRange=null;
+  if(cur>0){
+    currentRange={start:seq[seq.length-cur].date, end:seq[seq.length-1].date};
+  }
+  return {current:cur, longest, longestRange, currentRange};
+}
+function fmtMD(dateStr){               // "2026-05-03" -> "3/5" (dd/mm, Malaysian)
+  const m=parseInt(dateStr.slice(5,7),10), d=parseInt(dateStr.slice(8,10),10);
+  return d+"/"+m;
+}
+/* single date for a 1-day spell, range otherwise */
+function spellDates(range){
+  if(!range) return "";
+  return range.start===range.end ? fmtMD(range.start) : `${fmtMD(range.start)}–${fmtMD(range.end)}`;
+}
+function dryStreakHTML(days){
+  const s=drySpells(days);
+  if(s.longest===0) return ""; // no dry days at all in window — nothing to show
+  const curHot = s.current>=5;   // 5+ ongoing dry days = induction signal worth highlighting
+  const longTxt = spellDates(s.longestRange);
+  const curTxt = spellDates(s.currentRange);
+  // The current-streak tile always shows a second line so it lines up with the
+  // longest-spell tile (which always has a date range). When there's no ongoing
+  // dry streak (0 days), a dash holds the line; 1+ days shows the date(s).
+  const curLine = curTxt || "—";
+  return `<div class="dry-wrap">
+    <div class="dry-cap">${tr("dryTitle")}</div>
+    <div class="dry-row">
+      <div class="dry-stat">
+        <div class="dry-l">${tr("dryLongest")}${longTxt?`<span class="dry-range">${longTxt}</span>`:""}</div>
+        <div class="dry-n tabular">${s.longest}<span class="dry-u">${tr("dayUnit")}</span></div>
+      </div>
+      <div class="dry-stat ${curHot?"hot":""}">
+        <div class="dry-l">${tr("dryCurrent")}<span class="dry-range">${curLine}</span></div>
+        <div class="dry-n tabular">${s.current}<span class="dry-u">${tr("dayUnit")}</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* aggregate daily records into months (chronological) */
+function monthlyAgg(days){
+  const map=new Map();
+  days.forEach(d=>{
+    const key=d.date.slice(0,7); // YYYY-MM
+    if(!map.has(key)) map.set(key,{key,mm:0,rainy:0,known:0,total:0});
+    const o=map.get(key);
+    o.total++;
+    if(d.mm!=null){ o.mm+=d.mm; o.known++; if(d.mm>=RAIN_DAY_MM) o.rainy++; }
+  });
+  return [...map.values()].sort((a,b)=>a.key<b.key?-1:1);
+}
+/* total shown to the user = sum of the monthly figures AS DISPLAYED (each rounded to 0.1),
+   so the headline always equals what the farmer adds up from the monthly rows. */
+function displayTotal(days){
+  return monthlyAgg(days).reduce((a,m)=>a+Math.round(m.mm*10)/10, 0);
+}
+function monthLabel(key){
+  const m=parseInt(key.slice(5,7),10);
+  const yr=key.slice(2,4);
+  return tr("monthNames")[m-1]+" '"+yr;
+}
+
+/* 14-day mini bar strip */
+function miniChartHTML(days){
+  const last=days.slice(-14);
+  if(!last.length) return "";
+  const max=Math.max(...last.map(d=>d.mm==null?0:d.mm),1);
+  const bars=last.map(d=>{
+    if(d.mm==null){
+      return `<div class="mini-col"><div class="mini-bar nodata" style="height:8%"></div></div>`;
+    }
+    const h=Math.max(2,Math.round((d.mm/max)*100));
+    const cls=d.mm>=RAIN_DAY_MM?"wet":"dry";
+    return `<div class="mini-col"><div class="mini-bar ${cls}" style="height:${h}%"></div></div>`;
+  }).join("");
+  const first=fmtMD(last[0].date);
+  const lastD=fmtMD(last[last.length-1].date);
+  return `<div class="mini-wrap">
+    <div class="mini-cap"><span>${tr("last14")}</span><span class="mx">${tr("maxLabel")(max.toFixed(1))}</span></div>
+    <div class="mini-bars">${bars}</div>
+    <div class="mini-axis"><span>${first}</span><span>${lastD}</span></div>
+  </div>`;
+}
+
+/* 14-day Delta-T trendline (historical, neutral — no spray verdict bands).
+   Delta-T is drawn in the UPPER band and daily-high temperature in the LOWER band,
+   so the two lines never tangle. Each band scales to its own min/max. */
+function deltaTHTML(days){
+  const last=days.slice(-14);
+  const dtPts=last.map((d,i)=>({i,dt:d.dt})).filter(p=>p.dt!=null);
+  if(dtPts.length<2) return ""; // not enough Delta-T data to draw a trend
+  const tPts=last.map((d,i)=>({i,t:d.tmax})).filter(p=>p.t!=null);
+  const hasTemp=tPts.length>=2;
+  const W=300, H=120, padX=6;
+  const n=last.length;
+  const x=i=> padX + (n<=1?0:(i/(n-1))*(W-2*padX));
+  // band scaler: maps a value to y within [top,bottom] using the data's own min/max.
+  // If `must` is given, the domain is widened to include it (so a reference line at
+  // that value always has a true position even when no data point reaches it).
+  const bandScale=(arr,getv,top,bottom,must)=>{
+    let lo=Math.min(...arr.map(getv)), hi=Math.max(...arr.map(getv));
+    if(must!=null){ lo=Math.min(lo,must); hi=Math.max(hi,must); }
+    if(hi-lo<1.5){ const mid=(hi+lo)/2; lo=mid-0.75; hi=mid+0.75; }
+    return v=> top + (1-(v-lo)/(hi-lo))*(bottom-top);
+  };
+  // Upper band for Delta-T, lower band for temperature, with a gap between.
+  // Force the 10 threshold into the band's value domain so the dashed reference
+  // line below always sits at a true, comparable position relative to the trend.
+  const DT_THRESH=10;
+  const yDT=bandScale(dtPts,p=>p.dt, 10, 52, DT_THRESH);
+  const dtLine=dtPts.map(p=>`${x(p.i).toFixed(1)},${yDT(p.dt).toFixed(1)}`).join(" ");
+  const dtDots=dtPts.map(p=>{
+    const over=p.dt>DT_THRESH;
+    return `<circle cx="${x(p.i).toFixed(1)}" cy="${yDT(p.dt).toFixed(1)}" r="${over?2.8:2.3}" fill="${over?"#dc2626":"#6366f1"}"/>`;
+  }).join("");
+  // Red dashed threshold line at ΔT=10: above it, spray evaporates too fast.
+  const yThresh=yDT(DT_THRESH);
+  // keep the label inside the band: drop it below the line if the line hugs the top
+  const lblY = yThresh < 18 ? yThresh+9 : yThresh-3;
+  const threshLine=`<line x1="0" y1="${yThresh.toFixed(1)}" x2="${W}" y2="${yThresh.toFixed(1)}" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.75"/>`
+    +`<text x="${(W-2).toFixed(1)}" y="${lblY.toFixed(1)}" text-anchor="end" font-size="8" font-weight="800" fill="#dc2626">ΔT 10</text>`;
+  let tempSvg="", maxLabel="", tThreshLine="";
+  if(hasTemp){
+    // Force 30°C into the band domain so the flower-induction reference line below
+    // always has a true position relative to the daily-high trend.
+    const TEMP_THRESH=30;
+    const yT=bandScale(tPts,p=>p.t, 80, 108, TEMP_THRESH);
+    const tLine=tPts.map(p=>`${x(p.i).toFixed(1)},${yT(p.t).toFixed(1)}`).join(" ");
+    // Days at/above 30°C favour flower induction → mark them in a deeper amber.
+    const tDots=tPts.map(p=>{
+      const hot=p.t>=TEMP_THRESH;
+      return `<circle cx="${x(p.i).toFixed(1)}" cy="${yT(p.t).toFixed(1)}" r="${hot?2.6:2}" fill="${hot?"#d97706":"#f59e0b"}"/>`;
+    }).join("");
+    tempSvg=`<polyline fill="none" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${tLine}"/>${tDots}`;
+    // Green dashed reference at 30°C: at/above it, heat + dry spell eases flowering.
+    const yT30=yT(TEMP_THRESH);
+    const t30lblY = yT30 > 100 ? yT30-4 : yT30+10;   // keep label inside band
+    tThreshLine=`<line x1="0" y1="${yT30.toFixed(1)}" x2="${W}" y2="${yT30.toFixed(1)}" stroke="#059669" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.7"/>`
+      +`<text x="${(W-2).toFixed(1)}" y="${t30lblY.toFixed(1)}" text-anchor="end" font-size="8" font-weight="800" fill="#059669">30°C</text>`;
+    // Daily-high value on EVERY point, horizontal and sitting above each dot.
+    // Adjacent labels are staggered (alternating higher/lower) so they don't collide
+    // at phone width; edge labels are anchored inward to stay inside the viewBox.
+    maxLabel=tPts.map((p,k)=>{
+      const px=x(p.i);
+      const py=yT(p.t) - (k%2===0 ? 6 : 14);   // stagger: even higher, odd higher still
+      const anchor = px>W-14 ? "end" : (px<14 ? "start" : "middle");
+      return `<text x="${px.toFixed(1)}" y="${py.toFixed(1)}" text-anchor="${anchor}" font-size="7.5" font-weight="700" fill="#b45309">${p.t.toFixed(1)}</text>`;
+    }).join("");
+  }
+  const first=fmtMD(last[0].date);
+  const lastD=fmtMD(last[last.length-1].date);
+  const latestDT=dtPts[dtPts.length-1].dt;
+  const legend=hasTemp?`<div class="dt-legend">
+    <span><i class="dot-dt"></i>${tr("dtLegendDT")}</span>
+    <span><i class="dot-temp"></i>${tr("dtLegendTemp")}</span>
+  </div>`:``;
+  const nowTxt=`${tr("dtLatest")} ${tr("dtAbbr")} ${latestDT.toFixed(1)}`;
+  // faint divider between the two bands
+  const divider=hasTemp?`<line x1="0" y1="62" x2="${W}" y2="62" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="2 4"/>`:``;
+  return `<div class="dt-wrap">
+    <div class="dt-cap"><span>${tr("dtTitle")} <span class="dt-sub">${tr("dtTitleSub")}</span></span><span class="dt-now">${nowTxt}</span></div>
+    ${legend}
+    <svg class="dt-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      ${divider}
+      ${threshLine}
+      <polyline fill="none" stroke="#6366f1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${dtLine}"/>
+      ${dtDots}
+      ${tThreshLine}
+      ${tempSvg}
+      ${maxLabel}
+    </svg>
+    <div class="dt-axis"><span>${first}</span><span>${lastD}</span></div>
+    <div class="dt-ref">${tr("dtRef")}</div>
+  </div>`;
+}
+
+/* monthly rollup bars */
+function monthRollupHTML(days){
+  const months=monthlyAgg(days);
+  if(months.length<2) return "";
+  const max=Math.max(...months.map(m=>m.mm),1);
+  const rows=months.map(m=>{
+    const w=Math.max(3,Math.round((m.mm/max)*100));
+    // partial if not every calendar day of that month is in our window/data
+    const dim=new Date(parseInt(m.key.slice(0,4)),parseInt(m.key.slice(5,7)),0).getDate();
+    const partial=(m.known<dim);
+    const star=partial?`<span class="month-partial" title="${tr("partialNote")}">*</span>`:"";
+    return `<div class="month-row">
+      <div class="month-name">${monthLabel(m.key)}${star}</div>
+      <div class="month-track"><div class="month-fill" style="width:${w}%"></div></div>
+      <div class="month-mm tabular">${m.mm.toFixed(1)}</div>
+      <div class="month-days tabular">${m.rainy}${lang==="zh"?"天":"d"}</div>
+    </div>`;
+  }).join("");
+  const anyPartial=months.some(m=>{const dim=new Date(parseInt(m.key.slice(0,4)),parseInt(m.key.slice(5,7)),0).getDate(); return m.known<dim;});
+  const note=anyPartial?`<div class="month-note">${tr("partialNote")}</div>`:"";
+  return `<div class="month-wrap">
+    <div class="month-cap">${tr("byMonth")}</div>
+    ${rows}
+    ${note}
+  </div>`;
+}
+let editId=null;
+function openSheet(){
+  editId=null;
+  document.getElementById("binEntry").style.display="";
+  switchTab("manual");
+  document.getElementById("t-sheet-title").textContent=tr("sheetTitle");
+  document.getElementById("t-sheet-desc").textContent=tr("sheetDesc");
+  document.getElementById("inName").value="";
+  document.getElementById("inLat").value="";
+  document.getElementById("inLng").value="";
+  const g=document.getElementById("gpsStatus"); g.textContent=""; g.style.color="";
+  renderBin(); updateBinCount();
+  document.getElementById("overlay").classList.add("on");
+}
+function editLoc(id){
+  const loc=locations.find(l=>l.id===id); if(!loc) return;
+  if(swipeCurrentId) closeCardActions(swipeCurrentId);
+  editId=id;
+  document.getElementById("binEntry").style.display="none";
+  switchTab("manual");
+  document.getElementById("t-sheet-title").textContent=tr("editTitle");
+  document.getElementById("t-sheet-desc").textContent=tr("editDesc");
+  document.getElementById("inName").value=loc.name;
+  document.getElementById("inLat").value=loc.lat;
+  document.getElementById("inLng").value=loc.lng;
+  const g=document.getElementById("gpsStatus"); g.textContent=""; g.style.color="";
+  renderBin();
+  document.getElementById("overlay").classList.add("on");
+}
+function closeSheet(){document.getElementById("overlay").classList.remove("on"); editId=null;}
+function useGPS(){
+  const s=document.getElementById("gpsStatus");
+  if(!navigator.geolocation){s.style.color="#ef4444"; s.textContent=tr("gpsNo"); return}
+  s.style.color="#94a3b8"; s.textContent=tr("gpsWait");
+  navigator.geolocation.getCurrentPosition(p=>{
+    document.getElementById("inLat").value=p.coords.latitude.toFixed(6);
+    document.getElementById("inLng").value=p.coords.longitude.toFixed(6);
+    s.style.color="#047857"; s.textContent=tr("gpsOk");
+  },()=>{s.style.color="#ef4444"; s.textContent=tr("gpsFail")},
+  {enableHighAccuracy:true,timeout:10000,maximumAge:0});
+}
+function saveLoc(){
+  const name=document.getElementById("inName").value.trim();
+  const lat=parseFloat(document.getElementById("inLat").value);
+  const lng=parseFloat(document.getElementById("inLng").value);
+  const s=document.getElementById("gpsStatus");
+  if(!name){s.style.color="#ef4444"; s.textContent=tr("needName"); return}
+  if(isNaN(lat)||isNaN(lng)||lat<-90||lat>90||lng<-180||lng>180){s.style.color="#ef4444"; s.textContent=tr("needCoords"); return}
+  if(editId){
+    const loc=locations.find(l=>l.id===editId);
+    if(loc){
+      const moved=(loc.lat!==lat||loc.lng!==lng);
+      loc.name=name; loc.lat=lat; loc.lng=lng;
+      if(moved) delete cache[editId]; // coords changed -> old rainfall no longer valid
+      saveLoc_(); saveCache();
+    }
+  }else{
+    locations.push({id:"L"+Date.now(),name,lat,lng});
+    saveLoc_();
+  }
+  closeSheet(); render();
+}
+
+/* ===== soft delete / recycle bin ===== */
+function softDelete(id){
+  const i=locations.findIndex(l=>l.id===id); if(i<0) return;
+  if(swipeCurrentId) closeCardActions(swipeCurrentId);
+  const loc=locations[i];
+  bin.unshift({...loc, deletedAt:Date.now()});
+  locations.splice(i,1);
+  saveLoc_(); saveBin(); render(); updateBinCount();
+}
+function restoreLoc(id){
+  const i=bin.findIndex(l=>l.id===id); if(i<0) return;
+  const {deletedAt, ...loc}=bin[i];
+  if(locations.some(l=>l.id===loc.id)) loc.id="L"+Date.now();
+  locations.push(loc);
+  bin.splice(i,1);
+  saveLoc_(); saveBin(); render(); renderBin(); updateBinCount();
+}
+function purgeLoc(id){
+  const loc=bin.find(l=>l.id===id); if(!loc) return;
+  if(confirm(tr("confirmPurge")(loc.name))){
+    bin=bin.filter(l=>l.id!==id);
+    delete cache[id];
+    saveBin(); saveCache(); renderBin(); updateBinCount();
+  }
+}
+function renderBin(){
+  const box=document.getElementById("binList");
+  if(!box) return;
+  if(!bin.length){ box.innerHTML=`<div class="bin-empty">${tr("binEmpty")}</div>`; return; }
+  box.innerHTML=bin.map(loc=>`<div class="bin-row">
+    <div class="bin-info">
+      <div class="bin-name">${esc(loc.name)}</div>
+      <div class="bin-coords tabular">${(+loc.lat).toFixed(4)}, ${(+loc.lng).toFixed(4)}</div>
+    </div>
+    <button class="bin-btn bin-purge" onclick="purgeLoc('${loc.id}')">${tr("purge")}</button>
+    <button class="bin-btn bin-restore" onclick="restoreLoc('${loc.id}')">${tr("restore")}</button>
+  </div>`).join("");
+}
+function updateBinCount(){
+  const badge=document.getElementById("binCount");
+  if(!badge) return;
+  if(bin.length){ badge.textContent=bin.length; badge.classList.remove("hidden"); }
+  else badge.classList.add("hidden");
+}
+/* switch between Add view and Recycle view inside the + dialog */
+function switchTab(tab){
+  document.getElementById("view-manual").style.display = (tab==="manual")?"":"none";
+  document.getElementById("view-recycle").style.display = (tab==="recycle")?"":"none";
+  // title/subtitle follow the view (edit mode keeps its own title)
+  if(!editId){
+    if(tab==="recycle"){
+      document.getElementById("t-sheet-title").textContent=tr("binTitle");
+      document.getElementById("t-sheet-desc").textContent=tr("binDesc");
+    }else{
+      document.getElementById("t-sheet-title").textContent=tr("sheetTitle");
+      document.getElementById("t-sheet-desc").textContent=tr("sheetDesc");
+    }
+  }
+  if(tab==="recycle") renderBin();
+}
+
+/* ===== share (placeholder hook — content TBD) ===== */
+async function shareLoc(id){
+  const loc=locations.find(l=>l.id===id); if(!loc) return;
+  if(swipeCurrentId) closeCardActions(swipeCurrentId);
+  const c=cache[id];
+  const card=document.getElementById("content-"+id);
+
+  // Share text is framed around the flowering-induction signal — that's why a
+  // farmer shares: an ongoing dry streak (plus heat) is the trigger to act on.
+  // We lead with the current dry streak and how many of those days hit 30°C+,
+  // not the historical totals (which aren't what excites them to share).
+  const textMsg=()=>{
+    let m=`🌧️ ${loc.name}`;
+    if(c&&c.days&&c.days.length){
+      const s=drySpells(c.days);
+      m+=`\n${tr("shFlower")}`;
+      if(s.current>0){
+        // count, within the trailing dry run, days whose high reached 30°C+
+        const seq=c.days.filter(d=>d.mm!=null);
+        const tail=seq.slice(-s.current);
+        const hot=tail.filter(d=>d.tmax!=null && d.tmax>=30).length;
+        const range=spellDates(s.currentRange);
+        m+=`\n${tr("shCur")}: ${s.current} ${tr("shDayUnit")}${range?` (${range})`:""}`;
+        m+=`\n${tr("shHot")}: ${hot} ${tr("shDayUnit")}`;
+      }else{
+        m+=`\n${tr("shNone")}`;
+        // still useful context: the longest dry spell seen in the window
+        if(s.longest>0){
+          const lr=spellDates(s.longestRange);
+          m+=`\n${tr("shHist")}: ${s.longest} ${tr("shDayUnit")}${lr?` (${lr})`:""}`;
+        }
+      }
+    }
+    m+=`\n${tr("attrib")}`;
+    return m;
+  };
+
+  // No data yet, or capture lib missing -> just share text
+  if(!c||!c.days||!c.days.length||typeof html2canvas==="undefined"){
+    window.open("https://wa.me/?text="+encodeURIComponent(textMsg()),"_blank");
+    return;
+  }
+
+  const grip=card.querySelector(".grip");
+  const btnRow=card.querySelector(".btn-row");
+  const statusEl=card.querySelector(".card-status");
+  // hide interactive bits that shouldn't appear in a shared snapshot
+  if(grip) grip.style.visibility="hidden";
+  if(btnRow) btnRow.style.display="none";
+  if(statusEl) statusEl.style.display="none";
+
+  try{
+    const canvas=await html2canvas(card,{backgroundColor:"#ffffff",scale:2,useCORS:true,logging:false});
+    // restore UI immediately
+    if(grip) grip.style.visibility="";
+    if(btnRow) btnRow.style.display="";
+    if(statusEl) statusEl.style.display="";
+
+    const blob=await new Promise(res=>canvas.toBlob(res,"image/png"));
+    if(!blob) throw new Error("no blob");
+    const safe=loc.name.replace(/[\\\/:*?"<>|]/g,"_");
+    const file=new File([blob],`${safe}_rainlog.png`,{type:"image/png"});
+
+    // Preferred path: native share sheet WITH the image file -> farmer picks WhatsApp
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:loc.name, text:textMsg()});
+      return;
+    }
+    // Fallback: download the image so the farmer can attach it manually
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url; a.download=file.name; document.body.appendChild(a); a.click();
+    a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }catch(e){
+    // restore + final fallback to text share
+    if(grip) grip.style.visibility="";
+    if(btnRow) btnRow.style.display="";
+    if(statusEl) statusEl.style.display="";
+    if(e && e.name==="AbortError") return; // user cancelled the share sheet — do nothing
+    window.open("https://wa.me/?text="+encodeURIComponent(textMsg()),"_blank");
+  }
+}
+
+/* ===== swipe-reveal + right-click (bar slides in, card stays put) ===== */
+let swipeCurrentId=null, swipeStartX=0, swipeStartY=0, swipeDir=null, isSwiping=false;
+
+function openCardActions(id){
+  const wrap=document.getElementById("content-"+id)?.closest(".card-wrap");
+  if(!wrap) return;
+  wrap.classList.add("actions-open");
+  swipeCurrentId=id;
+}
+function closeCardActions(id){
+  const wrap=document.getElementById("content-"+id)?.closest(".card-wrap");
+  if(wrap) wrap.classList.remove("actions-open");
+  if(swipeCurrentId===id) swipeCurrentId=null;
+}
+function handleTouchStart(e,id){
+  if(swipeCurrentId&&swipeCurrentId!==id) closeCardActions(swipeCurrentId);
+  swipeStartX=e.touches[0].clientX; swipeStartY=e.touches[0].clientY; isSwiping=false; swipeDir=null;
+}
+function handleTouchMove(e,id){
+  const dx=e.touches[0].clientX-swipeStartX, dy=e.touches[0].clientY-swipeStartY;
+  if(!swipeDir){
+    if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>10){ swipeDir="h"; }
+    else if(Math.abs(dy)>10){ swipeDir="v"; }
+  }
+  if(swipeDir==="h"){
+    isSwiping=true;
+    if(e.cancelable) e.preventDefault();
+  }
+}
+function handleTouchEnd(e,id){
+  if(swipeDir==="v"){ return; }
+  if(swipeDir!=="h"){
+    // A tap (no horizontal drag). If this card's actions are already open and the
+    // tap landed on the card itself (not an action button), treat it as "cancel".
+    if(swipeCurrentId===id && !e.target.closest(".swipe-actions")){
+      closeCardActions(id);
+      if(e.cancelable) e.preventDefault();   // stop the follow-up click from re-toggling
+    }
+    return;
+  }
+  const dx=e.changedTouches[0].clientX-swipeStartX;
+  if(dx<-40) openCardActions(id);        // swipe left -> open
+  else if(dx>40) closeCardActions(id);   // swipe right -> close
+  setTimeout(()=>isSwiping=false,50);
+}
+function handleContextMenu(e,id){      // right-click toggles (primary desktop path)
+  e.preventDefault();
+  if(swipeCurrentId&&swipeCurrentId!==id) closeCardActions(swipeCurrentId);
+  if(swipeCurrentId===id) closeCardActions(id); else openCardActions(id);
+}
+function toggleCardActions(id){        // the ⋯ grip button — works on every device
+  if(swipeCurrentId&&swipeCurrentId!==id) closeCardActions(swipeCurrentId);
+  if(swipeCurrentId===id) closeCardActions(id); else openCardActions(id);
+}
+/* tap elsewhere closes an open card; tapping the open card's own surface
+   (anywhere except an action button) also cancels it */
+document.addEventListener("click",e=>{
+  if(!swipeCurrentId) return;
+  const wrap=e.target.closest(".card-wrap");
+  if(!wrap){ closeCardActions(swipeCurrentId); return; }   // tapped outside any card
+  // tapped inside a card: cancel only if it's the open card and not an action button
+  if(wrap.id==="wrap-"+swipeCurrentId && !e.target.closest(".swipe-actions") && !e.target.closest(".grip")){
+    closeCardActions(swipeCurrentId);
+  }
+});
+/* date helper: YYYY-MM-DD in local time */
+function ymd(d){
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,"0"), dd=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${dd}`;
+}
+/* Delta-T (°C) = dry-bulb − wet-bulb, from air temp (°C) and relative humidity (%).
+   Wet-bulb via Stull (2011) empirical approximation — accurate for normal field conditions.
+   Spray-band reference: 2–8 ideal, 8–10 marginal, >10 too evaporative, <2 too humid. */
+function deltaT(T, RH){
+  if(T==null||RH==null) return null;
+  RH=Math.max(1,Math.min(100,RH));
+  const Tw = T*Math.atan(0.151977*Math.sqrt(RH+8.313659))
+           + Math.atan(T+RH) - Math.atan(RH-1.676331)
+           + 0.00391838*Math.pow(RH,1.5)*Math.atan(0.023101*RH)
+           - 4.686035;
+  const d = T - Tw;
+  return (isFinite(d) && d>=0) ? d : null;
+}
+/* On launch: refresh only farms whose data is from a previous day, one at a time
+   (throttled), skipping entirely when offline. Keeps the numbers current without
+   bursting Open-Meteo. */
+function isFromPreviousDay(ts){
+  if(!ts) return true;                       // never fetched in this cache shape -> treat as stale
+  const f=new Date(ts), n=new Date();
+  return f.getFullYear()!==n.getFullYear() || f.getMonth()!==n.getMonth() || f.getDate()!==n.getDate();
+}
+let autoRefreshing=false;
+async function autoRefreshStale(){
+  if(autoRefreshing) return;                 // don't overlap runs
+  if(navigator.onLine===false) return;       // offline: keep showing cached data, don't error
+  // queue farms that have data but it's from a previous day
+  const queue=locations.filter(l=>{
+    const c=cache[l.id];
+    return c && c.days && c.days.length && isFromPreviousDay(c.fetched);
+  });
+  if(!queue.length) return;
+  autoRefreshing=true;
+  try{
+    for(const loc of queue){
+      try{ await getRain(loc.id); }catch(_){}   // getRain handles its own errors/UI
+      await new Promise(r=>setTimeout(r, 1200)); // throttle: ~1.2s gap between farms
+    }
+  }finally{ autoRefreshing=false; }
+}
+async function getRain(id){
+  const loc=locations.find(l=>l.id===id); if(!loc) return;
+  const btn=document.getElementById("ld-"+id);
+  const st=document.getElementById("st-"+id);
+  btn.disabled=true; btn.innerHTML=`<span class="spin"></span> ${tr("loading")}`;
+  st.style.color="#94a3b8"; st.textContent="";
+  try{
+    // Window: first day of the month 3 months ago  ->  yesterday.
+    const now=new Date();
+    const yesterday=new Date(now); yesterday.setDate(now.getDate()-1);
+    const start=new Date(now.getFullYear(), now.getMonth()-3, 1); // 1st of 3 months ago
+    const startStr=ymd(start), endStr=ymd(yesterday);
+
+    // Merge map: date -> mm (or null if missing). Seed every day in range as null
+    // so a day absent from BOTH sources stays honestly "no data", not 0.
+    const merged=new Map();
+    for(let d=new Date(start); d<=yesterday; d.setDate(d.getDate()+1)){
+      merged.set(ymd(d), null);
+    }
+    const apply=(dates,vals)=>{
+      if(!dates) return;
+      dates.forEach((dt,i)=>{
+        const v=vals?vals[i]:null;
+        if(merged.has(dt) && v!=null && !isNaN(v)) merged.set(dt, v);
+      });
+    };
+
+    // 1) Archive (ERA5) — gap-free for older days, lags ~5 days behind today.
+    const archiveUrl=`https://archive-api.open-meteo.com/v1/archive?latitude=${loc.lat}&longitude=${loc.lng}`
+      +`&start_date=${startStr}&end_date=${endStr}&daily=precipitation_sum,temperature_2m_max`
+      +`&hourly=temperature_2m,relative_humidity_2m&timezone=auto`;
+    // 2) Forecast past_days — covers the recent tail the archive hasn't filled yet.
+    const fcUrl=`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lng}`
+      +`&daily=precipitation_sum,temperature_2m_max&hourly=temperature_2m,relative_humidity_2m`
+      +`&past_days=92&forecast_days=0&timezone=auto`;
+
+    // daily max temperature: date -> °C (true daily high from the API)
+    const tmaxMap=new Map();
+    const applyTmax=(times,maxes)=>{
+      if(!times) return;
+      times.forEach((t,i)=>{
+        const v=maxes?maxes[i]:null;
+        if(v!=null && !isNaN(v)) tmaxMap.set(t, v);  // forecast overwrites archive for recent days
+      });
+    };
+
+    // hourly Delta-T accumulation: date -> highest Delta-T found in its 12:00–15:00 window
+    const dtMap=new Map();
+    const applyHourly=(times,temps,rhs)=>{
+      if(!times) return;
+      times.forEach((t,i)=>{
+        const hr=parseInt(t.slice(11,13),10);       // "2026-05-03T13:00" -> 13
+        if(hr<12 || hr>15) return;                  // only the 12:00–15:00 spray-risk window
+        const T=temps?temps[i]:null, RH=rhs?rhs[i]:null;
+        if(T==null||RH==null||isNaN(T)||isNaN(RH)) return;
+        const dt=deltaT(T,RH);
+        if(dt==null) return;
+        const day=t.slice(0,10);
+        const prev=dtMap.get(day);
+        if(prev==null || dt>prev) dtMap.set(day, dt);  // keep the worst (highest) of the window
+      });
+    };
+
+    let archiveOk=false, fcOk=false;
+    // Archive first (bulk of the window)
+    try{
+      const ar=await fetch(archiveUrl);
+      if(ar.ok){ const aj=await ar.json();
+        apply(aj.daily?.time, aj.daily?.precipitation_sum);
+        applyTmax(aj.daily?.time, aj.daily?.temperature_2m_max);
+        applyHourly(aj.hourly?.time, aj.hourly?.temperature_2m, aj.hourly?.relative_humidity_2m);
+        archiveOk=true; }
+    }catch(_){}
+    // Forecast second — overwrites recent days with fresher operational values
+    try{
+      const fr=await fetch(fcUrl);
+      if(fr.ok){ const fj=await fr.json();
+        apply(fj.daily?.time, fj.daily?.precipitation_sum);
+        applyTmax(fj.daily?.time, fj.daily?.temperature_2m_max);
+        applyHourly(fj.hourly?.time, fj.hourly?.temperature_2m, fj.hourly?.relative_humidity_2m);
+        fcOk=true; }
+    }catch(_){}
+
+    if(!archiveOk && !fcOk) throw new Error("both sources failed");
+
+    // Build chronological day list (mm may be null = no data; dt may be null = no reading)
+    const days=[...merged.keys()].sort().map(date=>({
+      date, mm:merged.get(date),
+      dt:(dtMap.has(date)?Math.round(dtMap.get(date)*10)/10:null),
+      tmax:(tmaxMap.has(date)?Math.round(tmaxMap.get(date)*10)/10:null)
+    }));
+    const known=days.filter(d=>d.mm!=null);
+    const total=known.reduce((a,b)=>a+b.mm,0);
+    const rainy=known.filter(d=>d.mm>=RAIN_DAY_MM).length;
+    const missing=days.length-known.length;
+
+    cache[id]={days,total,rainy,missing,stale:false,fetched:Date.now()};
+    saveCache(); render();
+  }catch(e){
+    btn.disabled=false;
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.6"/><polyline points="21 3 21 9 15 9"/></svg> ${cache[id]?tr("reget"):tr("get")}`;
+    st.style.color="#ef4444"; st.textContent=tr("errFetch");
+  }
+}
+function exportXLS(id){
+  const loc=locations.find(l=>l.id===id);
+  const c=cache[id];
+  if(!loc||!c||!c.days){alert(tr("xlNoData")); return}
+  const wk=tr("week");
+  const header=[tr("colDate"),tr("colWeek"),tr("colMM"),tr("colDT"),tr("colTMax")];
+  const rows=c.days.map(d=>{
+    const dt=new Date(d.date+"T00:00:00");
+    return [d.date,wk[dt.getDay()],(d.mm==null?"—":Number(d.mm.toFixed(1))),(d.dt==null?"—":Number(d.dt.toFixed(1))),(d.tmax==null?"—":Number(d.tmax.toFixed(1)))];
+  });
+  const knownCount=c.days.filter(d=>d.mm!=null).length;
+  const aoa=[
+    [loc.name,"",""],
+    [`${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)}`,"",""],
+    [],
+    header,
+    ...rows,
+    [],
+    [tr("sumLabel"),"",""],
+    [tr("total")+" (mm)","",Number(displayTotal(c.days).toFixed(1))],
+    [tr("rainy")+` (>=${RAIN_DAY_MM}mm)`,"",rainyCount(c.days)],
+    [tr("daysTotal"),"",c.days.length],
+    [tr("daysCovered"),"",knownCount]
+  ];
+  if(c.missing>0) aoa.push([tr("daysMissing"),"",c.missing]);
+  const ws=XLSX.utils.aoa_to_sheet(aoa);
+  ws["!cols"]=[{wch:16},{wch:9},{wch:14},{wch:12},{wch:14}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,tr("sheetName"));
+
+  const months=monthlyAgg(c.days);
+  const maoa=[
+    [loc.name,"",""],
+    [],
+    [tr("colMonth"),tr("colMonthMM"),tr("colMonthDays")],
+    ...months.map(m=>{
+      const dim=new Date(parseInt(m.key.slice(0,4)),parseInt(m.key.slice(5,7)),0).getDate();
+      const label=monthLabel(m.key)+(m.known<dim?" *":"");
+      return [label,Number(m.mm.toFixed(1)),m.rainy];
+    })
+  ];
+  const anyPartial=months.some(m=>{const dim=new Date(parseInt(m.key.slice(0,4)),parseInt(m.key.slice(5,7)),0).getDate(); return m.known<dim;});
+  if(anyPartial){ maoa.push([]); maoa.push([tr("partialNote"),"",""]); }
+  const mws=XLSX.utils.aoa_to_sheet(maoa);
+  mws["!cols"]=[{wch:14},{wch:20},{wch:12}];
+  XLSX.utils.book_append_sheet(wb,mws,tr("monthSheet"));
+
+  const safe=loc.name.replace(/[\\\/:*?"<>|]/g,"_");
+  XLSX.writeFile(wb,`${safe}_rain.xlsx`);
+}
+Object.keys(cache).forEach(k=>{if(cache[k]) cache[k].stale=true});
+applyLang();
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    const b=document.getElementById("boot-screen");
+    if(b){b.style.opacity="0"; setTimeout(()=>b.remove(),420)}
+  },650);
+  // register service worker for offline use (silently ignore if unsupported)
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("sw.js").catch(()=>{});
+  }
+  // Cached data shows instantly; then quietly refresh any farm whose data is from
+  // a previous day (one at a time, skipped if offline).
+  setTimeout(autoRefreshStale, 900);
+});
+// Relaunch from background (PWA reopened from app switcher) doesn't re-fire "load".
+// Re-check on return to foreground; autoRefreshStale only acts if data is a day old.
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible") autoRefreshStale();
+});
+</script>
+</body>
+</html>

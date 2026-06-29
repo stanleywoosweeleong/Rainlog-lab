@@ -1,0 +1,22 @@
+{
+  "name": "RainLog Lab · 雨量记录实验",
+  "short_name": "RainLog Lab",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#84d2f8",
+  "theme_color": "#84d2f8",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
