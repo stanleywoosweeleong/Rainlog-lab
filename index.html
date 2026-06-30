@@ -36,12 +36,13 @@
   .tabular{font-variant-numeric:tabular-nums}
   header{
     background:#fff; border-bottom:2px solid var(--slate-100);
-    display:flex; align-items:center; justify-content:space-between;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
     padding:0 18px; padding-top:var(--safe-top);
     height:calc(76px + var(--safe-top));
     position:sticky; top:0; z-index:50;
   }
-  .h-left{display:flex; align-items:center; gap:14px; min-width:0}
+  .h-left{display:flex; align-items:center; gap:10px; min-width:0; flex:0 1 auto}
+  .h-title{min-width:0; overflow:hidden}
   .icon-tile{
     width:34px; height:34px; background:var(--blue); border-radius:11px;
     display:flex; align-items:center; justify-content:center;
@@ -52,12 +53,13 @@
   .h-title h1{
     font-size:20px; font-weight:900; letter-spacing:-.03em; line-height:1;
     color:var(--slate-900); margin:0; white-space:nowrap;
+    overflow:hidden; text-overflow:ellipsis;
   }
   .h-title .sub{
     font-size:11px; font-weight:700; color:var(--slate-400);
     margin-top:5px; text-transform:uppercase; letter-spacing:.02em;
   }
-  .h-actions{display:flex; align-items:center; gap:8px; flex:none}
+  .h-actions{display:flex; align-items:center; gap:3px; flex:none}
   .add-btn{
     display:flex; align-items:center; justify-content:center; width:38px; height:38px;
     background:none; color:var(--blue);
@@ -65,15 +67,23 @@
   }
   .add-btn:active{transform:scale(.9)}
   .info-btn{
-    display:flex; align-items:center; justify-content:center; width:38px; height:38px;
+    display:flex; align-items:center; justify-content:center; width:34px; height:38px;
     background:none; color:var(--blue);
     border:none; cursor:pointer; transition:transform .15s; flex:none;
   }
   .info-btn:active{transform:scale(.9)}
+  /* drive mode: button pulses while running, with a progress badge */
+  #driveBtn{position:relative}
+  #driveBtn.driving svg{animation:drivePulse 1.4s ease-in-out infinite}
+  @keyframes drivePulse{0%,100%{opacity:1}50%{opacity:.4}}
+  #driveBtn.driving[data-prog]::after{content:attr(data-prog);position:absolute;
+    top:-7px;left:50%;transform:translateX(-30%);background:var(--blue);color:#fff;
+    font-size:9px;font-weight:800;line-height:1;padding:2px 5px;border-radius:9999px;
+    white-space:nowrap;animation:none;opacity:1;box-shadow:0 1px 3px rgba(0,0,0,.25)}
   .lang-btn{
     background:none; color:var(--blue);
     border:none; border-radius:9999px;
-    height:38px; padding:0 12px; font-size:14px; font-weight:900;
+    height:38px; padding:0 6px; font-size:14px; font-weight:900;
     cursor:pointer; flex:none; transition:transform .15s, background .15s, color .15s;
   }
   .lang-btn:active{transform:scale(.9)}
@@ -474,6 +484,9 @@
     </div>
   </div>
   <div class="h-actions">
+    <button class="info-btn" id="driveBtn" onclick="fetchAllSlowly()" title="开车模式 Drive mode：慢慢抓取全部果园" aria-label="Drive mode">
+      <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3v-5l2-5h11l3 5h2v5h-2"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+    </button>
     <button class="info-btn" id="infoBtn" onclick="openGuide()" title="使用说明 Guide" aria-label="使用说明 Guide">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.25"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.6" r="0.1" stroke-width="2.6"/></svg>
     </button>
@@ -751,7 +764,7 @@ const T={
     add:"添加", sheetTitle:"添加地点", sheetDesc:"为地点命名，然后输入坐标或使用 GPS 定位。",
     lName:"地点名称 / NAME", lCoords:"坐标 纬度 / 经度", gps:"使用我的 GPS 定位",
     cancel:"取消", save:"保存",
-    emptyT:"还没有地点", filterPlaceholder:"搜索果园名…", noMatch:"没有符合的果园", ungrouped:"其他", updateRegion:"更新此区所有果园", regionDone:(n)=>`已更新 ${n} 个果园`, regionDonePartial:(ok,n)=>`已更新 ${ok}/${n} 个（部分失败，可重试）`, exportAll:"导出全部果园 Excel", exportNone:"还没有任何已加载的数据可导出", colFarm:"果园", colRegion:"地区", colLat:"纬度", colLng:"经度", dataSheet:"每日数据", summarySheet:"果园汇总", emptyD:"点击右上角的「＋ 添加」按钮，开始记录雨量。",
+    emptyT:"还没有地点", filterPlaceholder:"搜索果园名…", noMatch:"没有符合的果园", ungrouped:"其他", updateRegion:"更新此区所有果园", regionDone:(n)=>`已更新 ${n} 个果园`, regionDonePartial:(ok,n)=>`已更新 ${ok}/${n} 个（部分失败，可重试）`, exportAll:"导出全部果园 Excel", exportNone:"还没有任何已加载的数据可导出", colFarm:"果园", colRegion:"地区", colLat:"纬度", colLng:"经度", dataSheet:"每日数据", summarySheet:"果园汇总", driveNone:"还没有果园可抓取", driveStart:(n)=>`开车模式：开始慢慢抓取 ${n} 个果园，可关屏但请别关 App`, driveDone:(n,sk)=>sk?`全部 ${n} 个已就绪（其中 ${sk} 个今天已抓取）`:`全部 ${n} 个果园已抓取完成 ✓`, driveDonePartial:(ok,n)=>`已抓取 ${ok}/${n} 个（部分失败，再按一次补抓）`, driveStopped:(d,n)=>`已停止（完成 ${d}/${n}，再按继续）`, emptyD:"点击右上角的「＋ 添加」按钮，开始记录雨量。",
     get:"查询雨量", reget:"重新查询", xls:"导出 Excel",
     total:"总降雨量", rainy:"有雨天数", daysTotal:"总天数", daysCovered:"涵盖天数", daysMissing:"缺失天数",
     threshLabel:"有雨天数标准", threshOfficial:"官方", threshOfficialSub:"≥1mm", threshUseful:"有效雨", threshUsefulSub:"≥2.5mm",
@@ -813,7 +826,7 @@ const T={
     add:"Add", sheetTitle:"Add location", sheetDesc:"Name the spot, then enter coordinates or use GPS.",
     lName:"LOCATION NAME / 名称", lCoords:"COORDINATES LAT / LNG", gps:"Use my GPS location",
     cancel:"Cancel", save:"Save",
-    emptyT:"No locations yet", filterPlaceholder:"Search orchards…", noMatch:"No matching orchards", ungrouped:"Other", updateRegion:"Update all orchards in this region", regionDone:(n)=>`Updated ${n} orchards`, regionDonePartial:(ok,n)=>`Updated ${ok}/${n} (some failed, try again)`, exportAll:"Export all orchards Excel", exportNone:"No loaded data to export yet", colFarm:"Orchard", colRegion:"Region", colLat:"Latitude", colLng:"Longitude", dataSheet:"Daily data", summarySheet:"Orchard summary", emptyD:"Tap the “＋ Add” button in the top-right to start logging rainfall.",
+    emptyT:"No locations yet", filterPlaceholder:"Search orchards…", noMatch:"No matching orchards", ungrouped:"Other", updateRegion:"Update all orchards in this region", regionDone:(n)=>`Updated ${n} orchards`, regionDonePartial:(ok,n)=>`Updated ${ok}/${n} (some failed, try again)`, exportAll:"Export all orchards Excel", exportNone:"No loaded data to export yet", colFarm:"Orchard", colRegion:"Region", colLat:"Latitude", colLng:"Longitude", dataSheet:"Daily data", summarySheet:"Orchard summary", driveNone:"No orchards to fetch yet", driveStart:(n)=>`Drive mode: gathering ${n} orchards slowly. Screen can sleep, but keep the app open.`, driveDone:(n,sk)=>sk?`All ${n} ready (${sk} were already done today)`:`All ${n} orchards fetched ✓`, driveDonePartial:(ok,n)=>`Fetched ${ok}/${n} (some failed — tap again to finish)`, driveStopped:(d,n)=>`Stopped (${d}/${n} done — tap to resume)`, emptyD:"Tap the “＋ Add” button in the top-right to start logging rainfall.",
     get:"Get rainfall", reget:"Refresh", xls:"Export Excel",
     total:"Total rainfall", rainy:"Rainy days", daysTotal:"Total days", daysCovered:"Days covered", daysMissing:"Days missing",
     threshLabel:"Rainy-day basis", threshOfficial:"Official", threshOfficialSub:"≥1mm", threshUseful:"Useful", threshUsefulSub:"≥2.5mm",
@@ -1065,6 +1078,56 @@ function toast(msg){
   if(!el){ el=document.createElement("div"); el.id="toast"; el.className="toast"; document.body.appendChild(el); }
   el.textContent=msg; el.classList.add("on");
   clearTimeout(_toastT); _toastT=setTimeout(()=>el.classList.remove("on"),2600);
+}
+
+/* ---------- Drive mode: fetch every orchard, slowly ----------
+   Tap before leaving for the orchard; by the time you arrive all farms are gathered.
+   Paced one farm at a time with a gap between each, so it never trips Open-Meteo's
+   rate limiter. Skips farms whose data is already from today. Pausable (tap again to
+   stop) and resumable — a phone call or signal drop won't lose progress; getRain
+   already retries on 429/503. */
+const DRIVE_GAP_MS = 2200;
+let driveRunning = false;
+let driveAbort = false;
+function driveSleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+function isFarmDoneToday(loc){
+  const c=cache[loc.id];
+  return !!(c && c.days && c.days.length && !isFromPreviousDay(c.fetched));
+}
+
+async function fetchAllSlowly(){
+  if(driveRunning){ driveAbort=true; return; }   // tap again = stop
+  const btn=document.getElementById("driveBtn");
+  if(!locations.length){ toast(tr("driveNone")); return; }
+
+  driveRunning=true; driveAbort=false;
+  if(btn) btn.classList.add("driving");
+  let wake=null;
+  try{ if(navigator.wakeLock) wake=await navigator.wakeLock.request("screen"); }catch(_){}
+
+  let done=0, failed=0, skipped=0;
+  const setBadge=()=>{ if(btn) btn.setAttribute("data-prog",`${done+skipped}/${locations.length}`); };
+  setBadge();
+  toast(tr("driveStart")(locations.length));
+
+  for(const loc of locations){
+    if(driveAbort) break;
+    if(isFarmDoneToday(loc)){ skipped++; setBadge(); continue; }
+    const okR=await getRain(loc.id,{quiet:true});
+    if(okR) done++; else failed++;
+    setBadge();
+    if(driveAbort) break;
+    await driveSleep(DRIVE_GAP_MS);
+  }
+
+  driveRunning=false;
+  try{ if(wake) await wake.release(); }catch(_){}
+  if(btn){ btn.classList.remove("driving"); btn.removeAttribute("data-prog"); }
+  render();
+  if(driveAbort) toast(tr("driveStopped")(done, locations.length));
+  else if(failed) toast(tr("driveDonePartial")(locations.length-failed, locations.length));
+  else toast(tr("driveDone")(locations.length, skipped));
 }
 /* show toggle only when at least one farm has data; reflect current threshold + language */
 function renderThreshToggle(){
