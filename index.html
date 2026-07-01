@@ -294,7 +294,7 @@
   .stat.days .l{color:#047857}
   .stat .su{font-size:12px; font-weight:900; margin-left:1px; opacity:.85}
 
-  /* 14-day mini bar strip */
+  /* 18-day mini bar strip */
   /* dry-spell tracker (flowering-induction signal) */
   .dry-wrap{background:#fffbeb; border:1px solid #fef3c7; border-radius:12px; padding:11px 12px 12px; margin-bottom:12px}
   .dry-cap{font-size:12px; font-weight:900; text-transform:uppercase; letter-spacing:.03em; color:#b45309; margin-bottom:9px}
@@ -784,7 +784,7 @@ const REGION_RENAMES = { "Jerantut":"Jerantut 而连突", "Miketam":"Miketam 苏
 const T={
   zh:{
     title:"雨量记录 Lab", sub:"近 3 个月雨量 · 实验版",
-    attrib:"数据来源：Open-Meteo",
+    attrib:"数据来源：Open-Meteo（CC BY 4.0）· 由 Claude 协助编程",
     shCur:"当前连旱", shHot:"其中达 30°C", shNone:"目前没有连旱（昨天有雨）", shHist:"最长连旱", shFlower:"🌸 诱花时机参考", shDayUnit:"天",
     add:"添加", sheetTitle:"添加地点", sheetDesc:"为地点命名，然后输入坐标或使用 GPS 定位。",
     lName:"地点名称 / NAME", lCoords:"坐标 纬度 / 经度", gps:"使用我的 GPS 定位",
@@ -805,9 +805,9 @@ const T={
     confirmPurge:n=>`永久删除「${n}」？此操作无法复原。`,
     colDate:"日期", colWeek:"星期", colMM:"降雨量 (mm)", colDT:"Delta-T (°C)", colTMax:"最高气温 (°C)",
     sumLabel:"汇总", sheetName:"每日雨量",
-    last14:"近 14 天", maxLabel:n=>`最高 ${n} mm`, byMonth:"按月统计", monthSheet:"按月汇总",
+    last14:"近 18 天", maxLabel:n=>`最高 ${n} mm`, byMonth:"按月统计", monthSheet:"按月汇总",
     dryTitle:"连续干旱（诱花参考）", dryCurrent:"当前连旱", dryLongest:"最长连旱", dayUnit:"天",
-    dtTitle:"Delta-T 趋势", dtTitleSub:"（近14天 · 中午12–3点）", dtLatest:"最新", dtAbbr:"ΔT", dtTempAbbr:"高温", dtLegendDT:"Delta-T", dtLegendTemp:"最高气温", dtRef:"参考：2–8 适宜喷药，8–10 临界，>10 蒸发过快，<2 太潮湿。红色虚线为 ΔT 10：高过此线那天喷药可能失效。绿色虚线为 30°C：达到或高于此线、配合干旱，有助花芽分化。此为历史记录，非实时建议。",
+    dtTitle:"Delta-T 趋势", dtTitleSub:"（近18天 · 中午12–3点）", dtLatest:"最新", dtAbbr:"ΔT", dtTempAbbr:"高温", dtLegendDT:"Delta-T", dtLegendTemp:"最高气温", dtRef:"参考：2–8 适宜喷药，8–10 临界，>10 蒸发过快，<2 太潮湿。红色虚线为 ΔT 10：高过此线那天喷药可能失效。绿色虚线为 30°C：达到或高于此线、配合干旱，有助花芽分化。此为历史记录，非实时建议。",
     partialNote:"* 该月数据不完整（仅部分日期）。",
     colMonth:"月份", colMonthMM:"月降雨量 (mm)", colMonthDays:"有雨天数",
     monthNames:["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"],
@@ -834,7 +834,7 @@ const T={
         {icon:"🌥️",bg:"#fff7ed",fg:"#c2410c",h:"连续干旱（诱花参考）",
          p:"显示三个月内<b>最长连旱</b>及<b>当前连旱</b>天数和日期。榴莲诱花需要一段干旱期，连旱天数可帮你判断诱花时机。干旱判定跟随上面的有雨标准。"},
         {icon:"📈",bg:"#eef2ff",fg:"#4f46e5",h:"Delta-T 趋势",
-         p:"近 14 天每日中午 12–3 点的最高 Delta-T。Delta-T 反映空气蒸发强度，用来回看过去哪几天<b>适合喷药</b>。参考：2–8 适宜，8–10 临界，>10 太干蒸发快，<2 太潮湿。仅为历史记录。"},
+         p:"近 18 天每日中午 12–3 点的最高 Delta-T。Delta-T 反映空气蒸发强度，用来回看过去哪几天<b>适合喷药</b>。参考：2–8 适宜，8–10 临界，>10 太干蒸发快，<2 太潮湿。仅为历史记录。"},
         {icon:"👆",bg:"#f1f5f9",fg:"#475569",h:"卡片操作",
          p:"在果园卡片上<b>向左滑动</b>、点右上角的 <b>⋯</b>、或电脑上<b>右键点击</b>，可显示 分享 / 编辑 / 删除。删除的果园会进入回收站，可还原或永久删除。"},
         {icon:"📤",bg:"#ecfdf5",fg:"#047857",h:"导出与分享",
@@ -846,7 +846,7 @@ const T={
   },
   en:{
     title:"RainLog Lab", sub:"LAST 3 MONTHS · LAB",
-    attrib:"Data: Open-Meteo",
+    attrib:"Data: Open-Meteo (CC BY 4.0) · Coded with Claude",
     shCur:"Current dry streak", shHot:"of which ≥30°C", shNone:"No dry streak right now (rain yesterday)", shHist:"Longest dry spell", shFlower:"🌸 Flower-induction window", shDayUnit:"d",
     add:"Add", sheetTitle:"Add location", sheetDesc:"Name the spot, then enter coordinates or use GPS.",
     lName:"LOCATION NAME / 名称", lCoords:"COORDINATES LAT / LNG", gps:"Use my GPS location",
@@ -867,9 +867,9 @@ const T={
     confirmPurge:n=>`Permanently delete “${n}”? This cannot be undone.`,
     colDate:"Date", colWeek:"Day", colMM:"Rainfall (mm)", colDT:"Delta-T (°C)", colTMax:"High temp (°C)",
     sumLabel:"Summary", sheetName:"Daily_rainfall",
-    last14:"Last 14 days", maxLabel:n=>`max ${n} mm`, byMonth:"By month", monthSheet:"By_month",
+    last14:"Last 18 days", maxLabel:n=>`max ${n} mm`, byMonth:"By month", monthSheet:"By_month",
     dryTitle:"Dry spell (flowering signal)", dryCurrent:"Current dry streak", dryLongest:"Longest dry spell", dayUnit:"d",
-    dtTitle:"Delta-T trend", dtTitleSub:"(last 14d · midday 12–3pm)", dtLatest:"latest", dtAbbr:"ΔT", dtTempAbbr:"high", dtLegendDT:"Delta-T", dtLegendTemp:"High temp", dtRef:"Reference: 2–8 good to spray, 8–10 marginal, >10 too evaporative, <2 too humid. Red dashed line = ΔT 10: days above it, your spray may not work. Green dashed line = 30°C: days at or above it, paired with a dry spell, help flower induction. Historical record, not live advice.",
+    dtTitle:"Delta-T trend", dtTitleSub:"(last 18d · midday 12–3pm)", dtLatest:"latest", dtAbbr:"ΔT", dtTempAbbr:"high", dtLegendDT:"Delta-T", dtLegendTemp:"High temp", dtRef:"Reference: 2–8 good to spray, 8–10 marginal, >10 too evaporative, <2 too humid. Red dashed line = ΔT 10: days above it, your spray may not work. Green dashed line = 30°C: days at or above it, paired with a dry spell, help flower induction. Historical record, not live advice.",
     partialNote:"* Partial month (only some days available).",
     colMonth:"Month", colMonthMM:"Monthly rainfall (mm)", colMonthDays:"Rainy days",
     monthNames:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
@@ -896,7 +896,7 @@ const T={
         {icon:"🌥️",bg:"#fff7ed",fg:"#c2410c",h:"Dry spell (flowering signal)",
          p:"Shows the <b>longest</b> and <b>current</b> dry streaks in days, with dates. Durian flowering needs a dry stress period, so the streak count helps you judge induction timing. A “dry day” follows the rainy-day basis above."},
         {icon:"📈",bg:"#eef2ff",fg:"#4f46e5",h:"Delta-T trend",
-         p:"The daily peak Delta-T (12–3pm) over the last 14 days. Delta-T reflects how evaporative the air is — useful for reviewing which past days were <b>good for spraying</b>. Reference: 2–8 good, 8–10 marginal, >10 too dry, <2 too humid. Historical only."},
+         p:"The daily peak Delta-T (12–3pm) over the last 18 days. Delta-T reflects how evaporative the air is — useful for reviewing which past days were <b>good for spraying</b>. Reference: 2–8 good, 8–10 marginal, >10 too dry, <2 too humid. Historical only."},
         {icon:"👆",bg:"#f1f5f9",fg:"#475569",h:"Card actions",
          p:"<b>Swipe left</b>, tap the <b>⋯</b>, or <b>right-click</b> on desktop to reveal Share / Edit / Delete. Deleted orchards go to the recycle bin, where you can restore or permanently delete them."},
         {icon:"📤",bg:"#ecfdf5",fg:"#047857",h:"Export & share",
@@ -1111,7 +1111,10 @@ function toast(msg){
    rate limiter. Skips farms whose data is already from today. Pausable (tap again to
    stop) and resumable — a phone call or signal drop won't lose progress; getRain
    already retries on 429/503. */
-const DRIVE_GAP_MS = 2200;
+const DRIVE_GAP_MS = 2200;          // baseline gap between orchards (~27 req/min)
+const DRIVE_GAP_MAX = 12000;        // ceiling when Open-Meteo is throttling
+let RATE_LIMIT_HITS = 0;            // set by fetchJSON on any 429/503
+let RATE_LIMIT_UNTIL = 0;           // wall-clock ms: hold the loop until at least this time
 let driveRunning = false;
 let driveAbort = false;
 function driveSleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
@@ -1133,6 +1136,7 @@ async function fetchAllSlowly(){
   try{ if(navigator.wakeLock) wake=await navigator.wakeLock.request("screen"); }catch(_){}
 
   let done=0, failed=0, skipped=0;
+  RATE_LIMIT_HITS=0; RATE_LIMIT_UNTIL=0;   // reset throttle tracking for this run
   const setBadge=()=>{ if(btn) btn.setAttribute("data-prog",`${done+skipped}/${locations.length}`); };
   setBadge();
   toast(tr("driveStart")(locations.length));
@@ -1144,7 +1148,13 @@ async function fetchAllSlowly(){
     if(okR) done++; else failed++;
     setBadge();
     if(driveAbort) break;
-    await driveSleep(DRIVE_GAP_MS);
+
+    // Adaptive pacing: grow the gap the more we've been throttled this run, and
+    // if a 429/503 just landed, wait out the cooldown before touching the API again.
+    let gap = Math.min(DRIVE_GAP_MAX, DRIVE_GAP_MS * (1 + RATE_LIMIT_HITS));
+    const cooldown = RATE_LIMIT_UNTIL - Date.now();
+    if(cooldown > 0) gap = Math.max(gap, cooldown);
+    await driveSleep(gap);
   }
 
   driveRunning=false;
@@ -1261,9 +1271,9 @@ function monthLabel(key){
   return tr("monthNames")[m-1]+" '"+yr;
 }
 
-/* 14-day mini bar strip */
+/* 18-day mini bar strip */
 function miniChartHTML(days){
-  const last=days.slice(-14);
+  const last=days.slice(-18);
   if(!last.length) return "";
   const max=Math.max(...last.map(d=>d.mm==null?0:d.mm),1);
   const bars=last.map(d=>{
@@ -1283,11 +1293,11 @@ function miniChartHTML(days){
   </div>`;
 }
 
-/* 14-day Delta-T trendline (historical, neutral — no spray verdict bands).
+/* 18-day Delta-T trendline (historical, neutral — no spray verdict bands).
    Delta-T is drawn in the UPPER band and daily-high temperature in the LOWER band,
    so the two lines never tangle. Each band scales to its own min/max. */
 function deltaTHTML(days){
-  const last=days.slice(-14);
+  const last=days.slice(-18);
   const dtPts=last.map((d,i)=>({i,dt:d.dt})).filter(p=>p.dt!=null);
   if(dtPts.length<2) return ""; // not enough Delta-T data to draw a trend
   const tPts=last.map((d,i)=>({i,t:d.tmax})).filter(p=>p.t!=null);
@@ -1730,6 +1740,10 @@ async function fetchJSON(url, {tries=4}={}){
     catch(e){ if(attempt===tries-1) throw e; await sleep(wait+Math.random()*300); wait=Math.min(wait*2,8000); continue; }
     if(res.ok) return res.json();
     if(res.status===429 || res.status===503){
+      // Signal the drive loop that Open-Meteo is throttling, so it can slow the
+      // whole fleet down — not just this one request's local retry.
+      RATE_LIMIT_HITS++;
+      RATE_LIMIT_UNTIL = Date.now() + 15000;   // hold the loop back for ~15s
       if(attempt===tries-1) return null;            // give up quietly; caller treats as missing
       const ra=parseInt(res.headers.get("Retry-After")||"",10);
       const delay=(!isNaN(ra)?ra*1000:wait)+Math.random()*300;
@@ -1766,18 +1780,54 @@ async function getRain(id, opts={}){
   if(btn){ btn.disabled=true; btn.innerHTML=`<span class="spin"></span> ${tr("loading")}`; }
   if(st){ st.style.color="#94a3b8"; st.textContent=""; }
   try{
-    // Window: first day of the month 3 months ago  ->  yesterday.
+    // ------------------------------------------------------------------
+    // Window: 16 months of history so BOTH durian cycles a year stay
+    // visible (dry-spell -> flowering -> harvest, repeating). ERA5 archive
+    // serves the full range; we only FETCH the recent tail each time and
+    // MERGE it onto whatever history is already cached, so the 16-month
+    // record accumulates instead of being re-downloaded every refresh.
+    // ------------------------------------------------------------------
+    const HISTORY_MONTHS = 16;   // rainfall + daily max-temp span
+    const DT_DAYS        = 18;   // hourly Delta-T span (dry-stress / bud-emergence window)
     const now=new Date();
     const yesterday=new Date(now); yesterday.setDate(now.getDate()-1);
-    const start=new Date(now.getFullYear(), now.getMonth()-3, 1); // 1st of 3 months ago
+    const start=new Date(now.getFullYear(), now.getMonth()-(HISTORY_MONTHS-1), 1); // 1st of the month, 16 months back
     const startStr=ymd(start), endStr=ymd(yesterday);
 
-    // Merge map: date -> mm (or null if missing). Seed every day in range as null
-    // so a day absent from BOTH sources stays honestly "no data", not 0.
-    const merged=new Map();
+    // Seed the full 16-month skeleton with null (honest "no data"),
+    // then carry forward any values already stored from previous fetches.
+    const merged=new Map();     // date -> mm
+    const tmaxMap=new Map();    // date -> °C daily high
+    const dtMap=new Map();      // date -> highest Delta-T in its 12:00–15:00 window
     for(let d=new Date(start); d<=yesterday; d.setDate(d.getDate()+1)){
       merged.set(ymd(d), null);
     }
+    const prevDays=(cache[id] && Array.isArray(cache[id].days)) ? cache[id].days : [];
+    for(const pd of prevDays){
+      if(!merged.has(pd.date)) continue;            // outside the 16-month window -> drop (rolls off)
+      if(pd.mm!=null)   merged.set(pd.date, pd.mm);
+      if(pd.tmax!=null) tmaxMap.set(pd.date, pd.tmax);
+      if(pd.dt!=null)   dtMap.set(pd.date, pd.dt);
+    }
+
+    // Fetch strategy:
+    //  - First fetch (no history yet): pull the FULL 16 months from ERA5 so the
+    //    orchard shows both cycles immediately.
+    //  - Refresh (history exists): only re-pull a ~120-day tail. Older ERA5 days
+    //    are final reanalysis and don't change, so re-downloading them is wasteful.
+    const haveHistory = prevDays.some(d=>d.mm!=null);
+    const tailDays = 120;
+    const tailStart=new Date(yesterday);
+    if(haveHistory){ tailStart.setDate(yesterday.getDate()-(tailDays-1)); }
+    else           { tailStart.setTime(start.getTime()); }   // full window on first fetch
+    if(tailStart<start) tailStart.setTime(start.getTime());
+    const tailStartStr=ymd(tailStart);
+
+    // Delta-T only for the last DT_DAYS days — keeps the heavy hourly payload tiny.
+    const dtStart=new Date(yesterday); dtStart.setDate(yesterday.getDate()-(DT_DAYS-1));
+    if(dtStart<start) dtStart.setTime(start.getTime());
+    const dtStartStr=ymd(dtStart), dtPastDays=Math.min(92, DT_DAYS+2);
+
     const apply=(dates,vals)=>{
       if(!dates) return;
       dates.forEach((dt,i)=>{
@@ -1785,28 +1835,13 @@ async function getRain(id, opts={}){
         if(merged.has(dt) && v!=null && !isNaN(v)) merged.set(dt, v);
       });
     };
-
-    // 1) Archive (ERA5) — gap-free for older days, lags ~5 days behind today.
-    const archiveUrl=`https://archive-api.open-meteo.com/v1/archive?latitude=${loc.lat}&longitude=${loc.lng}`
-      +`&start_date=${startStr}&end_date=${endStr}&daily=precipitation_sum,temperature_2m_max`
-      +`&hourly=temperature_2m,relative_humidity_2m&timezone=auto`;
-    // 2) Forecast past_days — covers the recent tail the archive hasn't filled yet.
-    const fcUrl=`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lng}`
-      +`&daily=precipitation_sum,temperature_2m_max&hourly=temperature_2m,relative_humidity_2m`
-      +`&past_days=92&forecast_days=0&timezone=auto`;
-
-    // daily max temperature: date -> °C (true daily high from the API)
-    const tmaxMap=new Map();
     const applyTmax=(times,maxes)=>{
       if(!times) return;
       times.forEach((t,i)=>{
         const v=maxes?maxes[i]:null;
-        if(v!=null && !isNaN(v)) tmaxMap.set(t, v);  // forecast overwrites archive for recent days
+        if(v!=null && !isNaN(v)) tmaxMap.set(t, v);  // fresher source overwrites older
       });
     };
-
-    // hourly Delta-T accumulation: date -> highest Delta-T found in its 12:00–15:00 window
-    const dtMap=new Map();
     const applyHourly=(times,temps,rhs)=>{
       if(!times) return;
       times.forEach((t,i)=>{
@@ -1822,17 +1857,26 @@ async function getRain(id, opts={}){
       });
     };
 
+    // 1) Archive (ERA5) — daily rainfall + max-temp for the recent tail only.
+    const archiveUrl=`https://archive-api.open-meteo.com/v1/archive?latitude=${loc.lat}&longitude=${loc.lng}`
+      +`&start_date=${tailStartStr}&end_date=${endStr}&daily=precipitation_sum,temperature_2m_max&timezone=auto`;
+    // 2) Forecast past_days — fills the last few days ERA5 hasn't finalized AND
+    //    supplies the full DT_DAYS hourly window for Delta-T (past_days covers it),
+    //    so we don't need a separate hourly archive call. One fewer request/orchard.
+    const fcUrl=`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lng}`
+      +`&daily=precipitation_sum,temperature_2m_max&hourly=temperature_2m,relative_humidity_2m`
+      +`&past_days=${dtPastDays}&forecast_days=0&timezone=auto`;
+
     let archiveOk=false, fcOk=false;
-    // Archive first (bulk of the window)
+    // Archive daily (bulk of the tail)
     try{
       const aj=await fetchJSON(archiveUrl);
       if(aj){
         apply(aj.daily?.time, aj.daily?.precipitation_sum);
         applyTmax(aj.daily?.time, aj.daily?.temperature_2m_max);
-        applyHourly(aj.hourly?.time, aj.hourly?.temperature_2m, aj.hourly?.relative_humidity_2m);
         archiveOk=true; }
     }catch(_){}
-    // Forecast second — overwrites recent days with fresher operational values
+    // Forecast — recent daily values + hourly Delta-T for the last DT_DAYS days
     try{
       const fj=await fetchJSON(fcUrl);
       if(fj){
@@ -1842,7 +1886,12 @@ async function getRain(id, opts={}){
         fcOk=true; }
     }catch(_){}
 
-    if(!archiveOk && !fcOk) throw new Error("both sources failed");
+    // Accept the fetch if a source responded OR we still hold prior history to keep.
+    if(!archiveOk && !fcOk && !prevDays.length) throw new Error("both sources failed");
+
+    // Drop Delta-T readings older than the DT_DAYS window (we no longer refresh them,
+    // and they aren't actionable for spray timing beyond ~18 days).
+    for(const k of [...dtMap.keys()]){ if(k < dtStartStr) dtMap.delete(k); }
 
     // Build chronological day list (mm may be null = no data; dt may be null = no reading)
     const days=[...merged.keys()].sort().map(date=>({
