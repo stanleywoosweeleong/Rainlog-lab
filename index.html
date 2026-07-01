@@ -309,6 +309,13 @@
   .dry-u{font-size:13px; font-weight:900; margin-left:1px}
   .dry-l{font-size:14px; font-weight:900; color:#92400e; line-height:1.2; flex:1; min-width:0; word-break:keep-all}
   .dry-range{display:block; font-size:11px; font-weight:700; color:#b45309; letter-spacing:0; margin-top:2px}
+  /* staged bud-emergence flag banner */
+  .dry-flag{display:flex; align-items:center; gap:8px; border-radius:10px; padding:8px 11px; margin-bottom:9px; font-weight:900; line-height:1.25}
+  .dry-flag .df-ic{font-size:16px; flex:none}
+  .dry-flag .df-t{font-size:13px; min-width:0}
+  .dry-flag.near{background:#fff7ed; border:1px solid #fdba74; color:#c2410c}
+  .dry-flag.prime{background:#ecfdf5; border:1px solid #6ee7b7; color:#047857}
+  .dry-flag.past{background:#f1f5f9; border:1px solid #cbd5e1; color:#475569}
 
   /* Delta-T trendline (historical spray-condition reference) */
   .dt-wrap{background:var(--slate-50); border:1px solid var(--slate-100); border-radius:12px; padding:10px 12px 8px; margin-bottom:12px}
@@ -806,7 +813,7 @@ const T={
     colDate:"日期", colWeek:"星期", colMM:"降雨量 (mm)", colDT:"Delta-T (°C)", colTMax:"最高气温 (°C)",
     sumLabel:"汇总", sheetName:"每日雨量",
     last14:"近 18 天", maxLabel:n=>`最高 ${n} mm`, byMonth:"按月统计", monthSheet:"按月汇总",
-    dryTitle:"连续干旱（诱花参考）", dryCurrent:"当前连旱", dryLongest:"最长连旱", dayUnit:"天",
+    dryTitle:"连续干旱（诱花参考）", dryCurrent:"当前连旱", dryLongest:"最长连旱", dayUnit:"天", flagNear:(n)=>`⚑ 已连旱 ${n} 天，接近诱花窗口（14–18 天），请留意`, flagPrime:(n)=>`已连旱 ${n} 天，进入诱花黄金窗口（14–18 天），有利花芽分化`, flagPast:(n)=>`已连旱 ${n} 天，超过黄金窗口（14–18 天），持续干旱恐增树体压力`,
     dtTitle:"Delta-T 趋势", dtTitleSub:"（近18天 · 中午12–3点）", dtLatest:"最新", dtAbbr:"ΔT", dtTempAbbr:"高温", dtLegendDT:"Delta-T", dtLegendTemp:"最高气温", dtRef:"参考：2–8 适宜喷药，8–10 临界，>10 蒸发过快，<2 太潮湿。红色虚线为 ΔT 10：高过此线那天喷药可能失效。绿色虚线为 30°C：达到或高于此线、配合干旱，有助花芽分化。此为历史记录，非实时建议。",
     partialNote:"* 该月数据不完整（仅部分日期）。",
     colMonth:"月份", colMonthMM:"月降雨量 (mm)", colMonthDays:"有雨天数",
@@ -868,7 +875,7 @@ const T={
     colDate:"Date", colWeek:"Day", colMM:"Rainfall (mm)", colDT:"Delta-T (°C)", colTMax:"High temp (°C)",
     sumLabel:"Summary", sheetName:"Daily_rainfall",
     last14:"Last 18 days", maxLabel:n=>`max ${n} mm`, byMonth:"By month", monthSheet:"By_month",
-    dryTitle:"Dry spell (flowering signal)", dryCurrent:"Current dry streak", dryLongest:"Longest dry spell", dayUnit:"d",
+    dryTitle:"Dry spell (flowering signal)", dryCurrent:"Current dry streak", dryLongest:"Longest dry spell", dayUnit:"d", flagNear:(n)=>`⚑ ${n} dry days — approaching the bud-emergence window (14–18d), watch closely`, flagPrime:(n)=>`${n} dry days — in the bud-emergence window (14–18d), good induction odds`, flagPast:(n)=>`${n} dry days — past the 14–18d window; prolonged drought may stress trees`,
     dtTitle:"Delta-T trend", dtTitleSub:"(last 18d · midday 12–3pm)", dtLatest:"latest", dtAbbr:"ΔT", dtTempAbbr:"high", dtLegendDT:"Delta-T", dtLegendTemp:"High temp", dtRef:"Reference: 2–8 good to spray, 8–10 marginal, >10 too evaporative, <2 too humid. Red dashed line = ΔT 10: days above it, your spray may not work. Green dashed line = 30°C: days at or above it, paired with a dry spell, help flower induction. Historical record, not live advice.",
     partialNote:"* Partial month (only some days available).",
     colMonth:"Month", colMonthMM:"Monthly rainfall (mm)", colMonthDays:"Rainy days",
@@ -1231,7 +1238,18 @@ function spellDates(range){
 function dryStreakHTML(days){
   const s=drySpells(days);
   if(s.longest===0) return ""; // no dry days at all in window — nothing to show
-  const curHot = s.current>=5;   // 5+ ongoing dry days = induction signal worth highlighting
+  // Staged bud-emergence flag on the ONGOING streak (research: 14–18 dry days
+  // lift induction odds; raise an early flag from 12 to give farmers lead time).
+  const cur=s.current;
+  let flag="";
+  if(cur>=19){
+    flag=`<div class="dry-flag past"><span class="df-ic">🌸</span><span class="df-t">${tr("flagPast")(cur)}</span></div>`;
+  }else if(cur>=14){
+    flag=`<div class="dry-flag prime"><span class="df-ic">🌸</span><span class="df-t">${tr("flagPrime")(cur)}</span></div>`;
+  }else if(cur>=12){
+    flag=`<div class="dry-flag near"><span class="df-ic">⚑</span><span class="df-t">${tr("flagNear")(cur)}</span></div>`;
+  }
+  const curHot = cur>=12;   // amber-highlight the current tile once the early flag is up
   const longTxt = spellDates(s.longestRange);
   const curTxt = spellDates(s.currentRange);
   // The current-streak tile always shows a second line so it lines up with the
@@ -1240,6 +1258,7 @@ function dryStreakHTML(days){
   const curLine = curTxt || "—";
   return `<div class="dry-wrap">
     <div class="dry-cap">${tr("dryTitle")}</div>
+    ${flag}
     <div class="dry-row">
       <div class="dry-stat">
         <div class="dry-l">${tr("dryLongest")}${longTxt?`<span class="dry-range">${longTxt}</span>`:""}</div>
