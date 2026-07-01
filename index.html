@@ -316,6 +316,7 @@
   .dry-flag.near{background:#fff7ed; border:1px solid #fdba74; color:#c2410c}
   .dry-flag.prime{background:#ecfdf5; border:1px solid #6ee7b7; color:#047857}
   .dry-flag.past{background:#f1f5f9; border:1px solid #cbd5e1; color:#475569}
+  .dry-alltime{font-size:11px; font-weight:700; color:#b45309; text-align:right; margin-top:7px; opacity:.85}
 
   /* Delta-T trendline (historical spray-condition reference) */
   .dt-wrap{background:var(--slate-50); border:1px solid var(--slate-100); border-radius:12px; padding:10px 12px 8px; margin-bottom:12px}
@@ -516,7 +517,7 @@
     </div>
   </div>
   <div class="h-actions">
-    <button class="info-btn" id="driveBtn" onclick="fetchAllSlowly()" title="开车模式 Drive mode：轻按抓取全部果园／长按补齐16个月历史 · Tap = fetch all · Hold = backfill 16 months" aria-label="Drive mode">
+    <button class="info-btn" id="driveBtn" onclick="fetchAllSlowly()" title="开车模式 Drive mode：慢慢抓取全部果园 · fetch all orchards" aria-label="Drive mode">
       <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3v-5l2-5h11l3 5h2v5h-2"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
     </button>
     <button class="info-btn" id="infoBtn" onclick="openGuide()" title="使用说明 Guide" aria-label="使用说明 Guide">
@@ -792,11 +793,11 @@ const T={
   zh:{
     title:"雨量记录 Lab", sub:"近 3 个月雨量 · 实验版",
     attrib:"数据来源：Open-Meteo（CC BY 4.0）· 由 Claude 协助编程",
-    shCur:"当前连旱", shHot:"其中达 30°C", shNone:"目前没有连旱（昨天有雨）", shHist:"最长连旱", shFlower:"🌸 诱花时机参考", shDayUnit:"天",
+    shCur:"当前连旱", shHot:"其中达 30°C", shNone:"目前没有连旱（昨天有雨）", shSeasonHist:"今年最长连旱", shHist:"16个月最长", shFlower:"🌸 诱花时机参考", shDayUnit:"天",
     add:"添加", sheetTitle:"添加地点", sheetDesc:"为地点命名，然后输入坐标或使用 GPS 定位。",
     lName:"地点名称 / NAME", lCoords:"坐标 纬度 / 经度", gps:"使用我的 GPS 定位",
     cancel:"取消", save:"保存",
-    emptyT:"还没有地点", filterPlaceholder:"搜索果园名…", noMatch:"没有符合的果园", ungrouped:"其他", updateRegion:"更新此区所有果园", regionDone:(n)=>`已更新 ${n} 个果园`, regionDonePartial:(ok,n)=>`已更新 ${ok}/${n} 个（部分失败，可重试）`, exportAll:"导出全部果园 Excel", exportNone:"还没有任何已加载的数据可导出", colFarm:"果园", colRegion:"地区", colLat:"纬度", colLng:"经度", dataSheet:"每日数据", summarySheet:"果园汇总", driveNone:"还没有果园可抓取", driveStart:(n)=>`开车模式：开始慢慢抓取 ${n} 个果园，可关屏但请别关 App`, driveDone:(n,sk)=>sk?`全部 ${n} 个已就绪（其中 ${sk} 个今天已抓取）`:`全部 ${n} 个果园已抓取完成 ✓`, driveDonePartial:(ok,n)=>`已抓取 ${ok}/${n} 个（部分失败，再按一次补抓）`, driveStopped:(d,n)=>`已停止（完成 ${d}/${n}，再按继续）`, backfillConfirm:(n)=>`长按＝补齐历史：将为全部 ${n} 个果园重新抓取完整 16 个月记录。数据量较大、耗时较长，建议接电源+Wi-Fi。是否开始？`, backfillStart:(n)=>`补齐历史：正在为 ${n} 个果园抓取完整 16 个月，请保持 App 开启。`, backfillDone:(n)=>`全部 ${n} 个果园已补齐 16 个月历史 ✓`, emptyD:"点击右上角的「＋ 添加」按钮，开始记录雨量。",
+    emptyT:"还没有地点", filterPlaceholder:"搜索果园名…", noMatch:"没有符合的果园", ungrouped:"其他", updateRegion:"更新此区所有果园", regionDone:(n)=>`已更新 ${n} 个果园`, regionDonePartial:(ok,n)=>`已更新 ${ok}/${n} 个（部分失败，可重试）`, exportAll:"导出全部果园 Excel", exportNone:"还没有任何已加载的数据可导出", colFarm:"果园", colRegion:"地区", colLat:"纬度", colLng:"经度", dataSheet:"每日数据", summarySheet:"果园汇总", driveNone:"还没有果园可抓取", driveStart:(n)=>`开车模式：开始慢慢抓取 ${n} 个果园，可关屏但请别关 App`, driveDone:(n,sk)=>sk?`全部 ${n} 个已就绪（其中 ${sk} 个今天已抓取）`:`全部 ${n} 个果园已抓取完成 ✓`, driveDonePartial:(ok,n)=>`已抓取 ${ok}/${n} 个（部分失败，再按一次补抓）`, driveStopped:(d,n)=>`已停止（完成 ${d}/${n}，再按继续）`, emptyD:"点击右上角的「＋ 添加」按钮，开始记录雨量。",
     get:"查询雨量", reget:"重新查询", xls:"导出 Excel",
     total:"总降雨量", rainy:"有雨天数", daysTotal:"总天数", daysCovered:"涵盖天数", daysMissing:"缺失天数",
     threshLabel:"有雨天数标准", threshOfficial:"官方", threshOfficialSub:"≥1mm", threshUseful:"有效雨", threshUsefulSub:"≥2.5mm",
@@ -813,7 +814,7 @@ const T={
     colDate:"日期", colWeek:"星期", colMM:"降雨量 (mm)", colDT:"Delta-T (°C)", colTMax:"最高气温 (°C)",
     sumLabel:"汇总", sheetName:"每日雨量",
     last14:"近 18 天", maxLabel:n=>`最高 ${n} mm`, byMonth:"按月统计", monthSheet:"按月汇总",
-    dryTitle:"连续干旱（诱花参考）", dryCurrent:"当前连旱", dryLongest:"最长连旱", dayUnit:"天", flagNear:(n)=>`⚑ 已连旱 ${n} 天，接近诱花窗口（14–18 天），请留意`, flagPrime:(n)=>`已连旱 ${n} 天，进入诱花黄金窗口（14–18 天），有利花芽分化`, flagPast:(n)=>`已连旱 ${n} 天，超过黄金窗口（14–18 天），持续干旱恐增树体压力`,
+    dryTitle:"连续干旱（诱花参考）", dryCurrent:"当前连旱", dryLongest:"最长连旱", drySeasonLongest:"今年最长连旱", dryAllTime:(n)=>`16个月最长：${n} 天`, dayUnit:"天", flagNear:(n)=>`⚑ 已连旱 ${n} 天，接近诱花窗口（14–18 天），请留意`, flagPrime:(n)=>`已连旱 ${n} 天，进入诱花黄金窗口（14–18 天），有利花芽分化`, flagPast:(n)=>`已连旱 ${n} 天，超过黄金窗口（14–18 天），持续干旱恐增树体压力`,
     dtTitle:"Delta-T 趋势", dtTitleSub:"（近18天 · 中午12–3点）", dtLatest:"最新", dtAbbr:"ΔT", dtTempAbbr:"高温", dtLegendDT:"Delta-T", dtLegendTemp:"最高气温", dtRef:"参考：2–8 适宜喷药，8–10 临界，>10 蒸发过快，<2 太潮湿。红色虚线为 ΔT 10：高过此线那天喷药可能失效。绿色虚线为 30°C：达到或高于此线、配合干旱，有助花芽分化。此为历史记录，非实时建议。",
     partialNote:"* 该月数据不完整（仅部分日期）。",
     colMonth:"月份", colMonthMM:"月降雨量 (mm)", colMonthDays:"有雨天数",
@@ -831,7 +832,7 @@ const T={
         {icon:"🗺️",bg:"#eef2ff",fg:"#4f46e5",h:"果园已预先载入",
          p:"应用已为你预载约 110 个果园地点（WeatherNext 大家庭的所有果园），<b>无需自己逐个添加</b>。地点按地区分组，点地区标题可展开或收起。果园多时上方会出现搜索框，可按名字快速查找。"},
         {icon:"🌧️",bg:"#dbeafe",fg:"#1d4ed8",h:"查询雨量",
-         p:"在果园卡片上点蓝色的 <b>查询雨量</b>。应用会取回近三个月加本月到昨天的每日雨量。查询一次后数据已保存，下次打开无需重新查询；想更新时再点「重新查询」即可。"},
+         p:"在果园卡片上点蓝色的 <b>查询雨量</b>。应用会取回<b>近 16 个月</b>的每日雨量（涵盖榴莲一年两造，方便对照去年同期）。查询一次后数据已保存，下次打开无需重新查询；想更新时再点「重新查询」即可。<br><b>第一次为全部果园抓取历史时数据量较大，建议睡前接上电源与 Wi-Fi，按「开车模式」让它慢慢跑完</b>——之后每天只需轻量更新。"},
         {icon:"↻",bg:"#dbeafe",fg:"#1d4ed8",h:"一键更新整个地区",
          p:"展开某个地区后，点地区标题右边的 <b>↻</b> 按钮，应用会依次为该地区<b>所有</b>果园查询雨量，按钮上显示进度（如 3/15）。更新有节制（每次最多两个请求），不会对服务器造成压力。管理多个果园时，这比逐个点查询省事很多。"},
         {icon:"📊",bg:"#ecfdf5",fg:"#047857",h:"总降雨量与有雨天数",
@@ -839,7 +840,7 @@ const T={
         {icon:"🌦️",bg:"#dbeafe",fg:"#1d4ed8",h:"两种有雨天数标准",
          p:"顶部的<b>有雨天数标准</b>可切换两种算法：<br><b>官方 ≥1mm（WMO）</b> — 世界气象组织（WMO）的标准，当天降雨达 1 毫米以上即算一个雨天，常用于官方气象统计。<br><b>有效雨 ≥2.5mm</b> — 农业角度，只算真正湿透土壤、对果树有用的雨；零星小雨不计。<br>多数果农用「有效雨」更贴近田间实际感受。切换即时生效，不需重新查询，也会同时影响下方的连旱判定。"},
         {icon:"🌥️",bg:"#fff7ed",fg:"#c2410c",h:"连续干旱（诱花参考）",
-         p:"显示三个月内<b>最长连旱</b>及<b>当前连旱</b>天数和日期。榴莲诱花需要一段干旱期，连旱天数可帮你判断诱花时机。干旱判定跟随上面的有雨标准。"},
+         p:"显示<b>今年最长连旱</b>（自 1 月 1 日起）及<b>当前连旱</b>的天数和日期，下方小字另附<b>16 个月最长</b>作为去年同期对照。<br>为什么分开看？榴莲一年两造，若只看 16 个月最长，去年的干旱可能盖过今年、误导本季判断，所以卡片以「今年」为主。<br>研究显示连旱 <b>14–18 天</b>较利花芽分化；本应用在连旱达 <b>12 天</b>时就提前亮旗提醒，让你早做准备。干旱判定跟随上面的有雨标准。"},
         {icon:"📈",bg:"#eef2ff",fg:"#4f46e5",h:"Delta-T 趋势",
          p:"近 18 天每日中午 12–3 点的最高 Delta-T。Delta-T 反映空气蒸发强度，用来回看过去哪几天<b>适合喷药</b>。参考：2–8 适宜，8–10 临界，>10 太干蒸发快，<2 太潮湿。仅为历史记录。"},
         {icon:"👆",bg:"#f1f5f9",fg:"#475569",h:"卡片操作",
@@ -854,11 +855,11 @@ const T={
   en:{
     title:"RainLog Lab", sub:"LAST 3 MONTHS · LAB",
     attrib:"Data: Open-Meteo (CC BY 4.0) · Coded with Claude",
-    shCur:"Current dry streak", shHot:"of which ≥30°C", shNone:"No dry streak right now (rain yesterday)", shHist:"Longest dry spell", shFlower:"🌸 Flower-induction window", shDayUnit:"d",
+    shCur:"Current dry streak", shHot:"of which ≥30°C", shNone:"No dry streak right now (rain yesterday)", shSeasonHist:"Longest this year", shHist:"16-mo peak", shFlower:"🌸 Flower-induction window", shDayUnit:"d",
     add:"Add", sheetTitle:"Add location", sheetDesc:"Name the spot, then enter coordinates or use GPS.",
     lName:"LOCATION NAME / 名称", lCoords:"COORDINATES LAT / LNG", gps:"Use my GPS location",
     cancel:"Cancel", save:"Save",
-    emptyT:"No locations yet", filterPlaceholder:"Search orchards…", noMatch:"No matching orchards", ungrouped:"Other", updateRegion:"Update all orchards in this region", regionDone:(n)=>`Updated ${n} orchards`, regionDonePartial:(ok,n)=>`Updated ${ok}/${n} (some failed, try again)`, exportAll:"Export all orchards Excel", exportNone:"No loaded data to export yet", colFarm:"Orchard", colRegion:"Region", colLat:"Latitude", colLng:"Longitude", dataSheet:"Daily data", summarySheet:"Orchard summary", driveNone:"No orchards to fetch yet", driveStart:(n)=>`Drive mode: gathering ${n} orchards slowly. Screen can sleep, but keep the app open.`, driveDone:(n,sk)=>sk?`All ${n} ready (${sk} were already done today)`:`All ${n} orchards fetched ✓`, driveDonePartial:(ok,n)=>`Fetched ${ok}/${n} (some failed — tap again to finish)`, driveStopped:(d,n)=>`Stopped (${d}/${n} done — tap to resume)`, backfillConfirm:(n)=>`Hold = backfill history: re-fetch the full 16 months for all ${n} orchards. This is heavier and slower — best on power + Wi-Fi. Start now?`, backfillStart:(n)=>`Backfill: rebuilding full 16 months for ${n} orchards. Keep the app open.`, backfillDone:(n)=>`All ${n} orchards backfilled to 16 months ✓`, emptyD:"Tap the “＋ Add” button in the top-right to start logging rainfall.",
+    emptyT:"No locations yet", filterPlaceholder:"Search orchards…", noMatch:"No matching orchards", ungrouped:"Other", updateRegion:"Update all orchards in this region", regionDone:(n)=>`Updated ${n} orchards`, regionDonePartial:(ok,n)=>`Updated ${ok}/${n} (some failed, try again)`, exportAll:"Export all orchards Excel", exportNone:"No loaded data to export yet", colFarm:"Orchard", colRegion:"Region", colLat:"Latitude", colLng:"Longitude", dataSheet:"Daily data", summarySheet:"Orchard summary", driveNone:"No orchards to fetch yet", driveStart:(n)=>`Drive mode: gathering ${n} orchards slowly. Screen can sleep, but keep the app open.`, driveDone:(n,sk)=>sk?`All ${n} ready (${sk} were already done today)`:`All ${n} orchards fetched ✓`, driveDonePartial:(ok,n)=>`Fetched ${ok}/${n} (some failed — tap again to finish)`, driveStopped:(d,n)=>`Stopped (${d}/${n} done — tap to resume)`, emptyD:"Tap the “＋ Add” button in the top-right to start logging rainfall.",
     get:"Get rainfall", reget:"Refresh", xls:"Export Excel",
     total:"Total rainfall", rainy:"Rainy days", daysTotal:"Total days", daysCovered:"Days covered", daysMissing:"Days missing",
     threshLabel:"Rainy-day basis", threshOfficial:"Official", threshOfficialSub:"≥1mm", threshUseful:"Useful", threshUsefulSub:"≥2.5mm",
@@ -875,7 +876,7 @@ const T={
     colDate:"Date", colWeek:"Day", colMM:"Rainfall (mm)", colDT:"Delta-T (°C)", colTMax:"High temp (°C)",
     sumLabel:"Summary", sheetName:"Daily_rainfall",
     last14:"Last 18 days", maxLabel:n=>`max ${n} mm`, byMonth:"By month", monthSheet:"By_month",
-    dryTitle:"Dry spell (flowering signal)", dryCurrent:"Current dry streak", dryLongest:"Longest dry spell", dayUnit:"d", flagNear:(n)=>`⚑ ${n} dry days — approaching the bud-emergence window (14–18d), watch closely`, flagPrime:(n)=>`${n} dry days — in the bud-emergence window (14–18d), good induction odds`, flagPast:(n)=>`${n} dry days — past the 14–18d window; prolonged drought may stress trees`,
+    dryTitle:"Dry spell (flowering signal)", dryCurrent:"Current dry streak", dryLongest:"Longest dry spell", drySeasonLongest:"Longest this year", dryAllTime:(n)=>`16-mo peak: ${n}d`, dayUnit:"d", flagNear:(n)=>`⚑ ${n} dry days — approaching the bud-emergence window (14–18d), watch closely`, flagPrime:(n)=>`${n} dry days — in the bud-emergence window (14–18d), good induction odds`, flagPast:(n)=>`${n} dry days — past the 14–18d window; prolonged drought may stress trees`,
     dtTitle:"Delta-T trend", dtTitleSub:"(last 18d · midday 12–3pm)", dtLatest:"latest", dtAbbr:"ΔT", dtTempAbbr:"high", dtLegendDT:"Delta-T", dtLegendTemp:"High temp", dtRef:"Reference: 2–8 good to spray, 8–10 marginal, >10 too evaporative, <2 too humid. Red dashed line = ΔT 10: days above it, your spray may not work. Green dashed line = 30°C: days at or above it, paired with a dry spell, help flower induction. Historical record, not live advice.",
     partialNote:"* Partial month (only some days available).",
     colMonth:"Month", colMonthMM:"Monthly rainfall (mm)", colMonthDays:"Rainy days",
@@ -893,7 +894,7 @@ const T={
         {icon:"🗺️",bg:"#eef2ff",fg:"#4f46e5",h:"Your orchards are pre-loaded",
          p:"The app comes with ~110 orchards already loaded (every farm in the WeatherNext family), so <b>you don't have to add them yourself</b>. They're grouped by region — tap a region heading to expand or collapse it. When the list is long, a search box on top lets you jump to a farm by name."},
         {icon:"🌧️",bg:"#dbeafe",fg:"#1d4ed8",h:"Get rainfall",
-         p:"Tap the blue <b>Get rainfall</b> on a card. It fetches daily rainfall for the last three full months plus this month to yesterday. Data is saved, so you needn't re-fetch each time — tap “Refresh” when you want to update."},
+         p:"Tap the blue <b>Get rainfall</b> on a card. It fetches <b>16 months</b> of daily rainfall (covering both of the year's durian cycles, so you can compare against the same period last year). Data is saved, so you needn't re-fetch each time — tap “Refresh” to update. <b>The first full-fleet history fetch is large — best done overnight on power + Wi-Fi: tap “Drive mode” before bed and let it run.</b> After that, daily updates are light."},
         {icon:"↻",bg:"#dbeafe",fg:"#1d4ed8",h:"Update a whole region at once",
          p:"Expand a region and tap the <b>↻</b> button on its heading — the app fetches rainfall for <b>every</b> orchard in that region, one after another, with progress shown on the button (e.g. 3/15). It's throttled (at most two requests at a time) so it never strains the server. When you manage many orchards this saves far more taps than fetching each one."},
         {icon:"📊",bg:"#ecfdf5",fg:"#047857",h:"Total & rainy days",
@@ -901,7 +902,7 @@ const T={
         {icon:"🌦️",bg:"#dbeafe",fg:"#1d4ed8",h:"Two rainy-day standards",
          p:"The <b>Rainy-day basis</b> at the top switches between two ways of counting:<br><b>Official ≥1mm (WMO)</b> — the World Meteorological Organization standard; any day with 1mm or more counts as a rainy day. Used in official weather statistics.<br><b>Useful ≥2.5mm</b> — the agricultural view; only rain that truly wets the soil and helps the trees counts, ignoring light drizzle.<br>Most growers find “Useful” matches what they feel in the field. Switching is instant, needs no re-fetch, and also affects the dry-spell count below."},
         {icon:"🌥️",bg:"#fff7ed",fg:"#c2410c",h:"Dry spell (flowering signal)",
-         p:"Shows the <b>longest</b> and <b>current</b> dry streaks in days, with dates. Durian flowering needs a dry stress period, so the streak count helps you judge induction timing. A “dry day” follows the rainy-day basis above."},
+         p:"Shows the <b>longest dry streak this year</b> (since Jan 1) and the <b>current</b> streak, with dates; a small line below adds the <b>16-month peak</b> for last-year comparison. Why split them? Durian has two cycles a year, so an all-time 16-month peak can belong to last year and mask this season's spell — the card leads with 'this year'. Research points to <b>14–18 dry days</b> favouring bud emergence; the app raises an early flag from <b>12 days</b> so you can prepare ahead. A “dry day” follows the rainy-day basis above."},
         {icon:"📈",bg:"#eef2ff",fg:"#4f46e5",h:"Delta-T trend",
          p:"The daily peak Delta-T (12–3pm) over the last 18 days. Delta-T reflects how evaporative the air is — useful for reviewing which past days were <b>good for spraying</b>. Reference: 2–8 good, 8–10 marginal, >10 too dry, <2 too humid. Historical only."},
         {icon:"👆",bg:"#f1f5f9",fg:"#475569",h:"Card actions",
@@ -1128,17 +1129,20 @@ function driveSleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
 function isFarmDoneToday(loc){
   const c=cache[loc.id];
-  return !!(c && c.days && c.days.length && !isFromPreviousDay(c.fetched));
+  if(!(c && c.days && c.days.length && !isFromPreviousDay(c.fetched))) return false;
+  // Not "done" if history is still incomplete — let drive mode backfill it even
+  // though it was already touched today. `coveredFrom` marks the earliest date a
+  // prior fetch reached; if it hasn't reached the 16-month start, there's a gap.
+  const now=new Date();
+  const wStart=ymd(new Date(now.getFullYear(), now.getMonth()-15, 1)); // 16-month start (HISTORY_MONTHS-1)
+  if(!c.coveredFrom || c.coveredFrom > wStart) return false;
+  return true;
 }
 
-async function fetchAllSlowly(backfill=false){
+async function fetchAllSlowly(){
   if(driveRunning){ driveAbort=true; return; }   // tap again = stop
   const btn=document.getElementById("driveBtn");
   if(!locations.length){ toast(tr("driveNone")); return; }
-
-  // Backfill pulls the FULL 16 months for EVERY orchard — much heavier than a
-  // normal run, so make it a deliberate choice.
-  if(backfill && !confirm(tr("backfillConfirm")(locations.length))) return;
 
   driveRunning=true; driveAbort=false;
   if(btn) btn.classList.add("driving");
@@ -1150,13 +1154,14 @@ async function fetchAllSlowly(backfill=false){
   RATE_LIMIT_HITS=0; RATE_LIMIT_UNTIL=0;   // reset throttle tracking for this run
   const setBadge=()=>{ if(btn) btn.setAttribute("data-prog",`${done+skipped}/${locations.length}`); };
   setBadge();
-  toast(backfill ? tr("backfillStart")(locations.length) : tr("driveStart")(locations.length));
+  toast(tr("driveStart")(locations.length));
 
   for(const loc of locations){
     if(driveAbort) break;
-    // In backfill we re-fetch every orchard even if it was done today.
-    if(!backfill && isFarmDoneToday(loc)){ skipped++; setBadge(); continue; }
-    const okR=await getRain(loc.id,{quiet:true, force:backfill});
+    // Skip orchards already fully fetched today; getRain auto-backfills any that
+    // still have an older gap (first run after this update rebuilds them once).
+    if(isFarmDoneToday(loc)){ skipped++; setBadge(); continue; }
+    const okR=await getRain(loc.id,{quiet:true});
     if(okR) done++; else failed++;
     setBadge();
     if(driveAbort) break;
@@ -1176,7 +1181,7 @@ async function fetchAllSlowly(backfill=false){
   render();
   if(driveAbort) toast(tr("driveStopped")(done, locations.length));
   else if(failed) toast(tr("driveDonePartial")(locations.length-failed, locations.length));
-  else toast(backfill ? tr("backfillDone")(locations.length) : tr("driveDone")(locations.length, skipped));
+  else toast(tr("driveDone")(locations.length, skipped));
 }
 /* show toggle only when at least one farm has data; reflect current threshold + language */
 function renderThreshToggle(){
@@ -1224,7 +1229,26 @@ function drySpells(days){
   if(cur>0){
     currentRange={start:seq[seq.length-cur].date, end:seq[seq.length-1].date};
   }
-  return {current:cur, longest, longestRange, currentRange};
+
+  // Season-scoped longest: only spells that FALL WITHIN this calendar year
+  // (since Jan 1). With 16 months of history the all-time longest can belong to
+  // LAST year's cycle and mask the spell driving THIS season's flowering, so this
+  // is the figure the card leads with. A spell counts if any of its days are in
+  // the current year; we measure only the in-year portion of the run.
+  const jan1 = `${new Date().getFullYear()}-01-01`;
+  let sLongest=0, sEnd=-1, sRun=0;
+  for(let i=0;i<seq.length;i++){
+    const inYear = seq[i].date>=jan1;
+    if(seq[i].mm<RAIN_DAY_MM && inYear){ sRun++; if(sRun>sLongest){sLongest=sRun; sEnd=i;} }
+    else sRun=0;   // wet day OR pre-Jan-1 day breaks the in-year run
+  }
+  let seasonRange=null;
+  if(sLongest>0 && sEnd>=0){
+    seasonRange={start:seq[sEnd-sLongest+1].date, end:seq[sEnd].date};
+  }
+
+  return {current:cur, longest, longestRange, currentRange,
+          seasonLongest:sLongest, seasonRange};
 }
 function fmtMD(dateStr){               // "2026-05-03" -> "3/5" (dd/mm, Malaysian)
   const m=parseInt(dateStr.slice(5,7),10), d=parseInt(dateStr.slice(8,10),10);
@@ -1250,8 +1274,15 @@ function dryStreakHTML(days){
     flag=`<div class="dry-flag near"><span class="df-ic">⚑</span><span class="df-t">${tr("flagNear")(cur)}</span></div>`;
   }
   const curHot = cur>=12;   // amber-highlight the current tile once the early flag is up
+  const seasonTxt = spellDates(s.seasonRange);
   const longTxt = spellDates(s.longestRange);
   const curTxt = spellDates(s.currentRange);
+  // Primary "longest" tile shows THIS season (since Jan 1) — the spell relevant to
+  // the current flowering cycle. The 16-month all-time longest is kept as a small
+  // secondary line so year-over-year context isn't lost.
+  const allTimeLine = (s.longest>0 && s.longest!==s.seasonLongest)
+    ? `<div class="dry-alltime">${tr("dryAllTime")(s.longest)}${longTxt?` · ${longTxt}`:""}</div>`
+    : "";
   // The current-streak tile always shows a second line so it lines up with the
   // longest-spell tile (which always has a date range). When there's no ongoing
   // dry streak (0 days), a dash holds the line; 1+ days shows the date(s).
@@ -1261,14 +1292,15 @@ function dryStreakHTML(days){
     ${flag}
     <div class="dry-row">
       <div class="dry-stat">
-        <div class="dry-l">${tr("dryLongest")}${longTxt?`<span class="dry-range">${longTxt}</span>`:""}</div>
-        <div class="dry-n tabular">${s.longest}<span class="dry-u">${tr("dayUnit")}</span></div>
+        <div class="dry-l">${tr("drySeasonLongest")}${seasonTxt?`<span class="dry-range">${seasonTxt}</span>`:""}</div>
+        <div class="dry-n tabular">${s.seasonLongest}<span class="dry-u">${tr("dayUnit")}</span></div>
       </div>
       <div class="dry-stat ${curHot?"hot":""}">
         <div class="dry-l">${tr("dryCurrent")}<span class="dry-range">${curLine}</span></div>
         <div class="dry-n tabular">${s.current}<span class="dry-u">${tr("dayUnit")}</span></div>
       </div>
     </div>
+    ${allTimeLine}
   </div>`;
 }
 
@@ -1585,8 +1617,13 @@ async function shareLoc(id){
         m+=`\n${tr("shHot")}: ${hot} ${tr("shDayUnit")}`;
       }else{
         m+=`\n${tr("shNone")}`;
-        // still useful context: the longest dry spell seen in the window
-        if(s.longest>0){
+        // Lead with THIS YEAR's longest (relevant to the current cycle); add the
+        // 16-month peak only if it's a different, larger figure (last-year context).
+        if(s.seasonLongest>0){
+          const sr=spellDates(s.seasonRange);
+          m+=`\n${tr("shSeasonHist")}: ${s.seasonLongest} ${tr("shDayUnit")}${sr?` (${sr})`:""}`;
+        }
+        if(s.longest>0 && s.longest!==s.seasonLongest){
           const lr=spellDates(s.longestRange);
           m+=`\n${tr("shHist")}: ${s.longest} ${tr("shDayUnit")}${lr?` (${lr})`:""}`;
         }
@@ -1835,13 +1872,21 @@ async function getRain(id, opts={}){
     }
 
     // Fetch strategy:
-    //  - First fetch (no history yet), OR a forced backfill: pull the FULL 16
-    //    months from ERA5 so the orchard shows both cycles immediately.
-    //  - Normal refresh (history exists): only re-pull a ~120-day tail. Older ERA5
-    //    days are final reanalysis and don't change, so re-downloading is wasteful.
+    //  - First fetch (no history yet), a forced backfill, OR an orchard whose
+    //    stored history doesn't yet cover the full 16 months (e.g. built under the
+    //    old 4-month code): pull the FULL window so the gap self-heals. After that
+    //    one full run the record is complete, so every later run takes the light path.
+    //  - Normal refresh (history already spans the window): only re-pull a ~120-day
+    //    tail. Older ERA5 days are final reanalysis and don't change.
     const haveHistory = prevDays.some(d=>d.mm!=null);
-    const wantFull = opts.force || !haveHistory;
     const tailDays = 120;
+    // Has this orchard ever been fetched all the way back to the window start?
+    // `coveredFrom` records the earliest date a prior fetch actually requested.
+    // If it's absent or newer than our window start, there's an un-fetched older
+    // stretch the tail can't reach -> pull the full window once to self-heal.
+    const coveredFrom = (cache[id] && cache[id].coveredFrom) || null;
+    const olderGap = !coveredFrom || coveredFrom > startStr;
+    const wantFull = opts.force || !haveHistory || olderGap;
     const tailStart=new Date(yesterday);
     if(wantFull){ tailStart.setTime(start.getTime()); }        // full 16-month window
     else        { tailStart.setDate(yesterday.getDate()-(tailDays-1)); }
@@ -1929,7 +1974,7 @@ async function getRain(id, opts={}){
     const rainy=known.filter(d=>d.mm>=RAIN_DAY_MM).length;
     const missing=days.length-known.length;
 
-    cache[id]={days,total,rainy,missing,stale:false,fetched:Date.now()};
+    cache[id]={days,total,rainy,missing,stale:false,fetched:Date.now(),coveredFrom:(wantFull?startStr:(cache[id]&&cache[id].coveredFrom)||tailStartStr)};
     saveCache();
     if(!opts.quiet) render();
     return true;
@@ -2058,24 +2103,6 @@ window.addEventListener("load",()=>{
   // Cached data shows instantly; then quietly refresh any farm whose data is from
   // a previous day (one at a time, skipped if offline).
   setTimeout(autoRefreshStale, 900);
-
-  // Drive button: TAP = normal drive run; PRESS & HOLD (~700ms) = full 16-month
-  // backfill of every orchard (one-time history rebuild). Confirms before running.
-  const dBtn=document.getElementById("driveBtn");
-  if(dBtn){
-    let holdTimer=null, held=false;
-    const startHold=()=>{ held=false; holdTimer=setTimeout(()=>{ held=true; fetchAllSlowly(true); }, 700); };
-    const cancelHold=()=>{ if(holdTimer){ clearTimeout(holdTimer); holdTimer=null; } };
-    dBtn.addEventListener("touchstart",startHold,{passive:true});
-    dBtn.addEventListener("touchend",cancelHold);
-    dBtn.addEventListener("touchmove",cancelHold,{passive:true});
-    dBtn.addEventListener("touchcancel",cancelHold);
-    dBtn.addEventListener("mousedown",startHold);
-    dBtn.addEventListener("mouseup",cancelHold);
-    dBtn.addEventListener("mouseleave",cancelHold);
-    // Swallow the click that follows a completed hold so it doesn't also start a normal run.
-    dBtn.addEventListener("click",(e)=>{ if(held){ e.preventDefault(); e.stopPropagation(); held=false; } }, true);
-  }
 });
 // Relaunch from background (PWA reopened from app switcher) doesn't re-fire "load".
 // Re-check on return to foreground; autoRefreshStale only acts if data is a day old.
