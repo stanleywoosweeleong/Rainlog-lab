@@ -509,7 +509,7 @@
     </div>
   </div>
   <div class="h-actions">
-    <button class="info-btn" id="driveBtn" onclick="fetchAllSlowly()" title="开车模式 Drive mode：慢慢抓取全部果园" aria-label="Drive mode">
+    <button class="info-btn" id="driveBtn" onclick="fetchAllSlowly()" title="开车模式 Drive mode：轻按抓取全部果园／长按补齐16个月历史 · Tap = fetch all · Hold = backfill 16 months" aria-label="Drive mode">
       <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3v-5l2-5h11l3 5h2v5h-2"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
     </button>
     <button class="info-btn" id="infoBtn" onclick="openGuide()" title="使用说明 Guide" aria-label="使用说明 Guide">
@@ -789,7 +789,7 @@ const T={
     add:"添加", sheetTitle:"添加地点", sheetDesc:"为地点命名，然后输入坐标或使用 GPS 定位。",
     lName:"地点名称 / NAME", lCoords:"坐标 纬度 / 经度", gps:"使用我的 GPS 定位",
     cancel:"取消", save:"保存",
-    emptyT:"还没有地点", filterPlaceholder:"搜索果园名…", noMatch:"没有符合的果园", ungrouped:"其他", updateRegion:"更新此区所有果园", regionDone:(n)=>`已更新 ${n} 个果园`, regionDonePartial:(ok,n)=>`已更新 ${ok}/${n} 个（部分失败，可重试）`, exportAll:"导出全部果园 Excel", exportNone:"还没有任何已加载的数据可导出", colFarm:"果园", colRegion:"地区", colLat:"纬度", colLng:"经度", dataSheet:"每日数据", summarySheet:"果园汇总", driveNone:"还没有果园可抓取", driveStart:(n)=>`开车模式：开始慢慢抓取 ${n} 个果园，可关屏但请别关 App`, driveDone:(n,sk)=>sk?`全部 ${n} 个已就绪（其中 ${sk} 个今天已抓取）`:`全部 ${n} 个果园已抓取完成 ✓`, driveDonePartial:(ok,n)=>`已抓取 ${ok}/${n} 个（部分失败，再按一次补抓）`, driveStopped:(d,n)=>`已停止（完成 ${d}/${n}，再按继续）`, emptyD:"点击右上角的「＋ 添加」按钮，开始记录雨量。",
+    emptyT:"还没有地点", filterPlaceholder:"搜索果园名…", noMatch:"没有符合的果园", ungrouped:"其他", updateRegion:"更新此区所有果园", regionDone:(n)=>`已更新 ${n} 个果园`, regionDonePartial:(ok,n)=>`已更新 ${ok}/${n} 个（部分失败，可重试）`, exportAll:"导出全部果园 Excel", exportNone:"还没有任何已加载的数据可导出", colFarm:"果园", colRegion:"地区", colLat:"纬度", colLng:"经度", dataSheet:"每日数据", summarySheet:"果园汇总", driveNone:"还没有果园可抓取", driveStart:(n)=>`开车模式：开始慢慢抓取 ${n} 个果园，可关屏但请别关 App`, driveDone:(n,sk)=>sk?`全部 ${n} 个已就绪（其中 ${sk} 个今天已抓取）`:`全部 ${n} 个果园已抓取完成 ✓`, driveDonePartial:(ok,n)=>`已抓取 ${ok}/${n} 个（部分失败，再按一次补抓）`, driveStopped:(d,n)=>`已停止（完成 ${d}/${n}，再按继续）`, backfillConfirm:(n)=>`长按＝补齐历史：将为全部 ${n} 个果园重新抓取完整 16 个月记录。数据量较大、耗时较长，建议接电源+Wi-Fi。是否开始？`, backfillStart:(n)=>`补齐历史：正在为 ${n} 个果园抓取完整 16 个月，请保持 App 开启。`, backfillDone:(n)=>`全部 ${n} 个果园已补齐 16 个月历史 ✓`, emptyD:"点击右上角的「＋ 添加」按钮，开始记录雨量。",
     get:"查询雨量", reget:"重新查询", xls:"导出 Excel",
     total:"总降雨量", rainy:"有雨天数", daysTotal:"总天数", daysCovered:"涵盖天数", daysMissing:"缺失天数",
     threshLabel:"有雨天数标准", threshOfficial:"官方", threshOfficialSub:"≥1mm", threshUseful:"有效雨", threshUsefulSub:"≥2.5mm",
@@ -851,7 +851,7 @@ const T={
     add:"Add", sheetTitle:"Add location", sheetDesc:"Name the spot, then enter coordinates or use GPS.",
     lName:"LOCATION NAME / 名称", lCoords:"COORDINATES LAT / LNG", gps:"Use my GPS location",
     cancel:"Cancel", save:"Save",
-    emptyT:"No locations yet", filterPlaceholder:"Search orchards…", noMatch:"No matching orchards", ungrouped:"Other", updateRegion:"Update all orchards in this region", regionDone:(n)=>`Updated ${n} orchards`, regionDonePartial:(ok,n)=>`Updated ${ok}/${n} (some failed, try again)`, exportAll:"Export all orchards Excel", exportNone:"No loaded data to export yet", colFarm:"Orchard", colRegion:"Region", colLat:"Latitude", colLng:"Longitude", dataSheet:"Daily data", summarySheet:"Orchard summary", driveNone:"No orchards to fetch yet", driveStart:(n)=>`Drive mode: gathering ${n} orchards slowly. Screen can sleep, but keep the app open.`, driveDone:(n,sk)=>sk?`All ${n} ready (${sk} were already done today)`:`All ${n} orchards fetched ✓`, driveDonePartial:(ok,n)=>`Fetched ${ok}/${n} (some failed — tap again to finish)`, driveStopped:(d,n)=>`Stopped (${d}/${n} done — tap to resume)`, emptyD:"Tap the “＋ Add” button in the top-right to start logging rainfall.",
+    emptyT:"No locations yet", filterPlaceholder:"Search orchards…", noMatch:"No matching orchards", ungrouped:"Other", updateRegion:"Update all orchards in this region", regionDone:(n)=>`Updated ${n} orchards`, regionDonePartial:(ok,n)=>`Updated ${ok}/${n} (some failed, try again)`, exportAll:"Export all orchards Excel", exportNone:"No loaded data to export yet", colFarm:"Orchard", colRegion:"Region", colLat:"Latitude", colLng:"Longitude", dataSheet:"Daily data", summarySheet:"Orchard summary", driveNone:"No orchards to fetch yet", driveStart:(n)=>`Drive mode: gathering ${n} orchards slowly. Screen can sleep, but keep the app open.`, driveDone:(n,sk)=>sk?`All ${n} ready (${sk} were already done today)`:`All ${n} orchards fetched ✓`, driveDonePartial:(ok,n)=>`Fetched ${ok}/${n} (some failed — tap again to finish)`, driveStopped:(d,n)=>`Stopped (${d}/${n} done — tap to resume)`, backfillConfirm:(n)=>`Hold = backfill history: re-fetch the full 16 months for all ${n} orchards. This is heavier and slower — best on power + Wi-Fi. Start now?`, backfillStart:(n)=>`Backfill: rebuilding full 16 months for ${n} orchards. Keep the app open.`, backfillDone:(n)=>`All ${n} orchards backfilled to 16 months ✓`, emptyD:"Tap the “＋ Add” button in the top-right to start logging rainfall.",
     get:"Get rainfall", reget:"Refresh", xls:"Export Excel",
     total:"Total rainfall", rainy:"Rainy days", daysTotal:"Total days", daysCovered:"Days covered", daysMissing:"Days missing",
     threshLabel:"Rainy-day basis", threshOfficial:"Official", threshOfficialSub:"≥1mm", threshUseful:"Useful", threshUsefulSub:"≥2.5mm",
@@ -1124,10 +1124,14 @@ function isFarmDoneToday(loc){
   return !!(c && c.days && c.days.length && !isFromPreviousDay(c.fetched));
 }
 
-async function fetchAllSlowly(){
+async function fetchAllSlowly(backfill=false){
   if(driveRunning){ driveAbort=true; return; }   // tap again = stop
   const btn=document.getElementById("driveBtn");
   if(!locations.length){ toast(tr("driveNone")); return; }
+
+  // Backfill pulls the FULL 16 months for EVERY orchard — much heavier than a
+  // normal run, so make it a deliberate choice.
+  if(backfill && !confirm(tr("backfillConfirm")(locations.length))) return;
 
   driveRunning=true; driveAbort=false;
   if(btn) btn.classList.add("driving");
@@ -1139,12 +1143,13 @@ async function fetchAllSlowly(){
   RATE_LIMIT_HITS=0; RATE_LIMIT_UNTIL=0;   // reset throttle tracking for this run
   const setBadge=()=>{ if(btn) btn.setAttribute("data-prog",`${done+skipped}/${locations.length}`); };
   setBadge();
-  toast(tr("driveStart")(locations.length));
+  toast(backfill ? tr("backfillStart")(locations.length) : tr("driveStart")(locations.length));
 
   for(const loc of locations){
     if(driveAbort) break;
-    if(isFarmDoneToday(loc)){ skipped++; setBadge(); continue; }
-    const okR=await getRain(loc.id,{quiet:true});
+    // In backfill we re-fetch every orchard even if it was done today.
+    if(!backfill && isFarmDoneToday(loc)){ skipped++; setBadge(); continue; }
+    const okR=await getRain(loc.id,{quiet:true, force:backfill});
     if(okR) done++; else failed++;
     setBadge();
     if(driveAbort) break;
@@ -1164,7 +1169,7 @@ async function fetchAllSlowly(){
   render();
   if(driveAbort) toast(tr("driveStopped")(done, locations.length));
   else if(failed) toast(tr("driveDonePartial")(locations.length-failed, locations.length));
-  else toast(tr("driveDone")(locations.length, skipped));
+  else toast(backfill ? tr("backfillDone")(locations.length) : tr("driveDone")(locations.length, skipped));
 }
 /* show toggle only when at least one farm has data; reflect current threshold + language */
 function renderThreshToggle(){
@@ -1811,15 +1816,16 @@ async function getRain(id, opts={}){
     }
 
     // Fetch strategy:
-    //  - First fetch (no history yet): pull the FULL 16 months from ERA5 so the
-    //    orchard shows both cycles immediately.
-    //  - Refresh (history exists): only re-pull a ~120-day tail. Older ERA5 days
-    //    are final reanalysis and don't change, so re-downloading them is wasteful.
+    //  - First fetch (no history yet), OR a forced backfill: pull the FULL 16
+    //    months from ERA5 so the orchard shows both cycles immediately.
+    //  - Normal refresh (history exists): only re-pull a ~120-day tail. Older ERA5
+    //    days are final reanalysis and don't change, so re-downloading is wasteful.
     const haveHistory = prevDays.some(d=>d.mm!=null);
+    const wantFull = opts.force || !haveHistory;
     const tailDays = 120;
     const tailStart=new Date(yesterday);
-    if(haveHistory){ tailStart.setDate(yesterday.getDate()-(tailDays-1)); }
-    else           { tailStart.setTime(start.getTime()); }   // full window on first fetch
+    if(wantFull){ tailStart.setTime(start.getTime()); }        // full 16-month window
+    else        { tailStart.setDate(yesterday.getDate()-(tailDays-1)); }
     if(tailStart<start) tailStart.setTime(start.getTime());
     const tailStartStr=ymd(tailStart);
 
@@ -2033,6 +2039,24 @@ window.addEventListener("load",()=>{
   // Cached data shows instantly; then quietly refresh any farm whose data is from
   // a previous day (one at a time, skipped if offline).
   setTimeout(autoRefreshStale, 900);
+
+  // Drive button: TAP = normal drive run; PRESS & HOLD (~700ms) = full 16-month
+  // backfill of every orchard (one-time history rebuild). Confirms before running.
+  const dBtn=document.getElementById("driveBtn");
+  if(dBtn){
+    let holdTimer=null, held=false;
+    const startHold=()=>{ held=false; holdTimer=setTimeout(()=>{ held=true; fetchAllSlowly(true); }, 700); };
+    const cancelHold=()=>{ if(holdTimer){ clearTimeout(holdTimer); holdTimer=null; } };
+    dBtn.addEventListener("touchstart",startHold,{passive:true});
+    dBtn.addEventListener("touchend",cancelHold);
+    dBtn.addEventListener("touchmove",cancelHold,{passive:true});
+    dBtn.addEventListener("touchcancel",cancelHold);
+    dBtn.addEventListener("mousedown",startHold);
+    dBtn.addEventListener("mouseup",cancelHold);
+    dBtn.addEventListener("mouseleave",cancelHold);
+    // Swallow the click that follows a completed hold so it doesn't also start a normal run.
+    dBtn.addEventListener("click",(e)=>{ if(held){ e.preventDefault(); e.stopPropagation(); held=false; } }, true);
+  }
 });
 // Relaunch from background (PWA reopened from app switcher) doesn't re-fire "load".
 // Re-check on return to foreground; autoRefreshStale only acts if data is a day old.
