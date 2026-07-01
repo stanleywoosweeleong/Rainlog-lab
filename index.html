@@ -72,6 +72,31 @@
     border:none; cursor:pointer; transition:transform .15s; flex:none;
   }
   .info-btn:active{transform:scale(.9)}
+  /* Battery-saving OLED dark theme — active only while drive-mode fetch runs.
+     True black (#000) turns OLED pixels off, unlike dark-grey which barely saves. */
+  body.drive-dark{background:#000; color:#c7ccd1}
+  body.drive-dark header,
+  body.drive-dark .card,
+  body.drive-dark .stat,
+  body.drive-dark .dry-wrap,
+  body.drive-dark .dry-stat,
+  body.drive-dark .dt-wrap,
+  body.drive-dark .mini-wrap,
+  body.drive-dark .thresh-toggle,
+  body.drive-dark .thresh-seg,
+  body.drive-dark .lg-count,
+  body.drive-dark .loc-filter,
+  body.drive-dark .export-all-btn{background:#000; border-color:#1a1a1a; color:#c7ccd1}
+  body.drive-dark .stat.rain,
+  body.drive-dark .stat.days{background:#050505}
+  body.drive-dark img,
+  body.drive-dark .mini-bar,
+  body.drive-dark .month-fill,
+  body.drive-dark .act-get,
+  body.drive-dark .act-xls{filter:brightness(.72)}
+  body.drive-dark #driveBtn.driving svg{color:#c7ccd1}
+  body.drive-dark *{transition:none !important}
+
   /* drive mode: button pulses while running, with a progress badge */
   #driveBtn{position:relative}
   #driveBtn.driving svg{animation:drivePulse 1.4s ease-in-out infinite}
@@ -1103,6 +1128,7 @@ async function fetchAllSlowly(){
 
   driveRunning=true; driveAbort=false;
   if(btn) btn.classList.add("driving");
+  document.body.classList.add("drive-dark");   // battery-saving OLED theme while fetching
   let wake=null;
   try{ if(navigator.wakeLock) wake=await navigator.wakeLock.request("screen"); }catch(_){}
 
@@ -1123,6 +1149,7 @@ async function fetchAllSlowly(){
 
   driveRunning=false;
   try{ if(wake) await wake.release(); }catch(_){}
+  document.body.classList.remove("drive-dark");   // restore normal theme when done
   if(btn){ btn.classList.remove("driving"); btn.removeAttribute("data-prog"); }
   render();
   if(driveAbort) toast(tr("driveStopped")(done, locations.length));
