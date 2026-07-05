@@ -72,30 +72,31 @@
     border:none; cursor:pointer; transition:transform .15s; flex:none;
   }
   .info-btn:active{transform:scale(.9)}
-  /* Battery-saving OLED dark theme — active only while drive-mode fetch runs.
-     True black (#000) turns OLED pixels off, unlike dark-grey which barely saves. */
-  body.drive-dark{background:#000; color:#c7ccd1}
-  body.drive-dark header,
-  body.drive-dark .card,
-  body.drive-dark .stat,
-  body.drive-dark .dry-wrap,
-  body.drive-dark .dry-stat,
-  body.drive-dark .dt-wrap,
-  body.drive-dark .mini-wrap,
-  body.drive-dark .thresh-toggle,
-  body.drive-dark .thresh-seg,
-  body.drive-dark .lg-count,
-  body.drive-dark .loc-filter,
-  body.drive-dark .export-all-btn{background:#000; border-color:#1a1a1a; color:#c7ccd1}
-  body.drive-dark .stat.rain,
-  body.drive-dark .stat.days{background:#050505}
-  body.drive-dark img,
-  body.drive-dark .mini-bar,
-  body.drive-dark .month-fill,
-  body.drive-dark .act-get,
-  body.drive-dark .act-xls{filter:brightness(.72)}
+  /* Battery-saving OLED drive mode — black everything and blank the content below
+     the header, showing only a big centered progress count. True #000 = OLED pixels
+     off, the real battery saving. */
+  body.drive-dark{background:#000}
+  body.drive-dark header{background:#000; border-color:#1a1a1a; z-index:70}
+  body.drive-dark header *{color:#c7ccd1 !important; fill:#c7ccd1}
   body.drive-dark #driveBtn.driving svg{color:#c7ccd1}
+  /* hide the small badge on the car in drive mode — the big overlay shows progress */
+  body.drive-dark #driveBtn.driving[data-prog]::after{display:none}
+  /* blank the scrolling content */
+  body.drive-dark main{visibility:hidden}
   body.drive-dark *{transition:none !important}
+  /* full-screen black overlay with the centered count */
+  #driveOverlay{position:fixed; inset:0; top:0; z-index:60; display:none;
+    background:#000; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px; padding:24px; text-align:center;
+    padding-top:calc(var(--safe-top) + 72px)}   /* clear the header */
+  body.drive-dark #driveOverlay{display:flex}
+  #driveOverlay .do-count{font-size:64px; font-weight:900; letter-spacing:-1px;
+    color:#e8eaed; font-variant-numeric:tabular-nums; line-height:1}
+  #driveOverlay .do-label{font-size:15px; font-weight:700; color:#7a828c; letter-spacing:.3px}
+  #driveOverlay .do-name{font-size:13px; color:#5a616b; max-width:80%;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  #driveOverlay .do-dot{width:9px; height:9px; border-radius:50%; background:#2563eb;
+    animation:drivePulse 1.4s ease-in-out infinite}
 
   /* drive mode: button pulses while running, with a progress badge */
   #driveBtn{position:relative}
@@ -530,6 +531,14 @@
   </div>
 </header>
 
+<!-- drive-mode black overlay: big centered progress count -->
+<div id="driveOverlay" aria-live="polite">
+  <div class="do-dot"></div>
+  <div class="do-count" id="doCount">0/0</div>
+  <div class="do-label" id="doLabel"></div>
+  <div class="do-name" id="doName"></div>
+</div>
+
 <!-- full-screen user guide -->
 <div class="guide-overlay" id="guideOverlay">
   <div class="guide-top">
@@ -797,7 +806,7 @@ const T={
     add:"添加", sheetTitle:"添加地点", sheetDesc:"为地点命名，然后输入坐标或使用 GPS 定位。",
     lName:"地点名称 / NAME", lCoords:"坐标 纬度 / 经度", gps:"使用我的 GPS 定位",
     cancel:"取消", save:"保存",
-    emptyT:"还没有地点", filterPlaceholder:"搜索果园名…", noMatch:"没有符合的果园", ungrouped:"其他", updateRegion:"更新此区所有果园", regionDone:(n)=>`已更新 ${n} 个果园`, regionDonePartial:(ok,n)=>`已更新 ${ok}/${n} 个（部分失败，可重试）`, exportAll:"导出全部果园 Excel", exportNone:"还没有任何已加载的数据可导出", colFarm:"果园", colRegion:"地区", colLat:"纬度", colLng:"经度", dataSheet:"每日数据", summarySheet:"果园汇总", driveNone:"还没有果园可抓取", driveStart:(n)=>`开车模式：开始慢慢抓取 ${n} 个果园，可关屏但请别关 App`, driveDone:(n,sk)=>sk?`全部 ${n} 个已就绪（其中 ${sk} 个今天已抓取）`:`全部 ${n} 个果园已抓取完成 ✓`, driveDonePartial:(ok,n)=>`已抓取 ${ok}/${n} 个（部分失败，再按一次补抓）`, driveStopped:(d,n)=>`已停止（完成 ${d}/${n}，再按继续）`, emptyD:"点击右上角的「＋ 添加」按钮，开始记录雨量。",
+    emptyT:"还没有地点", filterPlaceholder:"搜索果园名…", noMatch:"没有符合的果园", ungrouped:"其他", updateRegion:"更新此区所有果园", regionDone:(n)=>`已更新 ${n} 个果园`, regionDonePartial:(ok,n)=>`已更新 ${ok}/${n} 个（部分失败，可重试）`, exportAll:"导出全部果园 Excel", exportNone:"还没有任何已加载的数据可导出", colFarm:"果园", colRegion:"地区", colLat:"纬度", colLng:"经度", dataSheet:"每日数据", summarySheet:"果园汇总", driveProg:"抓取进度", driveNone:"还没有果园可抓取", driveStart:(n)=>`开车模式：开始慢慢抓取 ${n} 个果园，可关屏但请别关 App`, driveDone:(n,sk)=>sk?`全部 ${n} 个已就绪（其中 ${sk} 个今天已抓取）`:`全部 ${n} 个果园已抓取完成 ✓`, driveDonePartial:(ok,n)=>`已抓取 ${ok}/${n} 个（部分失败，再按一次补抓）`, driveStopped:(d,n)=>`已停止（完成 ${d}/${n}，再按继续）`, emptyD:"点击右上角的「＋ 添加」按钮，开始记录雨量。",
     get:"查询雨量", reget:"重新查询", xls:"导出 Excel",
     total:"总降雨量", rainy:"有雨天数", daysTotal:"总天数", daysCovered:"涵盖天数", daysMissing:"缺失天数",
     threshLabel:"有雨天数标准", threshOfficial:"官方", threshOfficialSub:"≥1mm", threshUseful:"有效雨", threshUsefulSub:"≥2.5mm",
@@ -859,7 +868,7 @@ const T={
     add:"Add", sheetTitle:"Add location", sheetDesc:"Name the spot, then enter coordinates or use GPS.",
     lName:"LOCATION NAME / 名称", lCoords:"COORDINATES LAT / LNG", gps:"Use my GPS location",
     cancel:"Cancel", save:"Save",
-    emptyT:"No locations yet", filterPlaceholder:"Search orchards…", noMatch:"No matching orchards", ungrouped:"Other", updateRegion:"Update all orchards in this region", regionDone:(n)=>`Updated ${n} orchards`, regionDonePartial:(ok,n)=>`Updated ${ok}/${n} (some failed, try again)`, exportAll:"Export all orchards Excel", exportNone:"No loaded data to export yet", colFarm:"Orchard", colRegion:"Region", colLat:"Latitude", colLng:"Longitude", dataSheet:"Daily data", summarySheet:"Orchard summary", driveNone:"No orchards to fetch yet", driveStart:(n)=>`Drive mode: gathering ${n} orchards slowly. Screen can sleep, but keep the app open.`, driveDone:(n,sk)=>sk?`All ${n} ready (${sk} were already done today)`:`All ${n} orchards fetched ✓`, driveDonePartial:(ok,n)=>`Fetched ${ok}/${n} (some failed — tap again to finish)`, driveStopped:(d,n)=>`Stopped (${d}/${n} done — tap to resume)`, emptyD:"Tap the “＋ Add” button in the top-right to start logging rainfall.",
+    emptyT:"No locations yet", filterPlaceholder:"Search orchards…", noMatch:"No matching orchards", ungrouped:"Other", updateRegion:"Update all orchards in this region", regionDone:(n)=>`Updated ${n} orchards`, regionDonePartial:(ok,n)=>`Updated ${ok}/${n} (some failed, try again)`, exportAll:"Export all orchards Excel", exportNone:"No loaded data to export yet", colFarm:"Orchard", colRegion:"Region", colLat:"Latitude", colLng:"Longitude", dataSheet:"Daily data", summarySheet:"Orchard summary", driveProg:"Fetching", driveNone:"No orchards to fetch yet", driveStart:(n)=>`Drive mode: gathering ${n} orchards slowly. Screen can sleep, but keep the app open.`, driveDone:(n,sk)=>sk?`All ${n} ready (${sk} were already done today)`:`All ${n} orchards fetched ✓`, driveDonePartial:(ok,n)=>`Fetched ${ok}/${n} (some failed — tap again to finish)`, driveStopped:(d,n)=>`Stopped (${d}/${n} done — tap to resume)`, emptyD:"Tap the “＋ Add” button in the top-right to start logging rainfall.",
     get:"Get rainfall", reget:"Refresh", xls:"Export Excel",
     total:"Total rainfall", rainy:"Rainy days", daysTotal:"Total days", daysCovered:"Days covered", daysMissing:"Days missing",
     threshLabel:"Rainy-day basis", threshOfficial:"Official", threshOfficialSub:"≥1mm", threshUseful:"Useful", threshUsefulSub:"≥2.5mm",
@@ -1152,8 +1161,17 @@ async function fetchAllSlowly(){
 
   let done=0, failed=0, skipped=0;
   RATE_LIMIT_HITS=0; RATE_LIMIT_UNTIL=0;   // reset throttle tracking for this run
-  const setBadge=()=>{ if(btn) btn.setAttribute("data-prog",`${done+skipped}/${locations.length}`); };
-  setBadge();
+  const doCount=document.getElementById("doCount");
+  const doLabel=document.getElementById("doLabel");
+  const doName=document.getElementById("doName");
+  if(doLabel) doLabel.textContent=tr("driveProg");
+  const setBadge=(name)=>{
+    const txt=`${done+skipped}/${locations.length}`;
+    if(btn) btn.setAttribute("data-prog",txt);
+    if(doCount) doCount.textContent=txt;
+    if(doName && name!=null) doName.textContent=name;
+  };
+  setBadge("");
   toast(tr("driveStart")(locations.length));
 
   for(const loc of locations){
@@ -1161,6 +1179,7 @@ async function fetchAllSlowly(){
     // Skip orchards already fully fetched today; getRain auto-backfills any that
     // still have an older gap (first run after this update rebuilds them once).
     if(isFarmDoneToday(loc)){ skipped++; setBadge(); continue; }
+    if(doName) doName.textContent=loc.name;   // show which orchard is fetching now
     const okR=await getRain(loc.id,{quiet:true});
     if(okR) done++; else failed++;
     setBadge();
