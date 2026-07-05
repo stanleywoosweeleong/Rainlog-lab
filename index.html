@@ -1141,7 +1141,15 @@ let driveRunning = false;
 let driveAbort = false;
 let DRIVE_STOP_CTL = null;                 // AbortController for the active drive run
 let DRIVE_STOP_SIGNAL = null;              // its .signal, watched by fetchJSON
-function driveSleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function driveSleep(ms){
+  // Resolve early if the user taps stop, so the inter-fetch gap doesn't delay a stop.
+  return new Promise(resolve=>{
+    let done=false;
+    const finish=()=>{ if(done) return; done=true; clearTimeout(t); if(DRIVE_STOP_SIGNAL) DRIVE_STOP_SIGNAL.removeEventListener("abort",finish); resolve(); };
+    const t=setTimeout(finish, ms);
+    if(DRIVE_STOP_SIGNAL) DRIVE_STOP_SIGNAL.addEventListener("abort",finish);
+  });
+}
 
 function isFarmDoneToday(loc){
   const c=cache[loc.id];
@@ -1167,14 +1175,16 @@ async function fetchAllSlowly(){
   let wake=null;
   try{ if(navigator.wakeLock) wake=await navigator.wakeLock.request("screen"); }catch(_){}
 
-  let done=0, failed=0, skipped=0;
+  let done=0, failed=0, skipped=0, processed=0;
   RATE_LIMIT_HITS=0; RATE_LIMIT_UNTIL=0;   // reset throttle tracking for this run
   const doCount=document.getElementById("doCount");
   const doLabel=document.getElementById("doLabel");
   const doName=document.getElementById("doName");
   if(doLabel) doLabel.textContent=tr("driveProg");
   const setBadge=(name)=>{
-    const txt=`${done+skipped}/${locations.length}`;
+    // Base the count on processed (skip + success + FAILURE) so a failed location
+    // still advances the number — otherwise the count stalls on every failure.
+    const txt=`${processed}/${locations.length}`;
     if(btn) btn.setAttribute("data-prog",txt);
     if(doCount) doCount.textContent=txt;
     if(doName && name!=null) doName.textContent=name;
@@ -1186,10 +1196,11 @@ async function fetchAllSlowly(){
     if(driveAbort) break;
     // Skip orchards already fully fetched today; getRain auto-backfills any that
     // still have an older gap (first run after this update rebuilds them once).
-    if(isFarmDoneToday(loc)){ skipped++; setBadge(); continue; }
+    if(isFarmDoneToday(loc)){ skipped++; processed++; setBadge(); continue; }
     if(doName) doName.textContent=loc.name;   // show which orchard is fetching now
     const okR=await getRain(loc.id,{quiet:true});
     if(okR) done++; else failed++;
+    processed++;                              // advance on success AND failure
     setBadge();
     if(driveAbort) break;
 
@@ -1198,7 +1209,8 @@ async function fetchAllSlowly(){
     let gap = Math.min(DRIVE_GAP_MAX, DRIVE_GAP_MS * (1 + RATE_LIMIT_HITS));
     const cooldown = RATE_LIMIT_UNTIL - Date.now();
     if(cooldown > 0) gap = Math.max(gap, cooldown);
-    await driveSleep(gap);
+    await driveSleep(gap);                    // interruptible: a stop-tap resolves it early
+    if(driveAbort) break;
   }
 
   driveRunning=false;
@@ -1207,7 +1219,7 @@ async function fetchAllSlowly(){
   document.body.classList.remove("drive-dark");   // restore normal theme when done
   if(btn){ btn.classList.remove("driving"); btn.removeAttribute("data-prog"); }
   render();
-  if(driveAbort) toast(tr("driveStopped")(done, locations.length));
+  if(driveAbort) toast(tr("driveStopped")(processed, locations.length));
   else if(failed) toast(tr("driveDonePartial")(locations.length-failed, locations.length));
   else toast(tr("driveDone")(locations.length, skipped));
 }
