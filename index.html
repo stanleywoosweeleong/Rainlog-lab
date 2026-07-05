@@ -1139,6 +1139,8 @@ let RATE_LIMIT_HITS = 0;            // set by fetchJSON on any 429/503
 let RATE_LIMIT_UNTIL = 0;           // wall-clock ms: hold the loop until at least this time
 let driveRunning = false;
 let driveAbort = false;
+let DRIVE_STOP_CTL = null;                 // AbortController for the active drive run
+let DRIVE_STOP_SIGNAL = null;              // its .signal, watched by fetchJSON
 function driveSleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
 function isFarmDoneToday(loc){
@@ -1154,11 +1156,12 @@ function isFarmDoneToday(loc){
 }
 
 async function fetchAllSlowly(){
-  if(driveRunning){ driveAbort=true; return; }   // tap again = stop
+  if(driveRunning){ driveAbort=true; try{ DRIVE_STOP_CTL && DRIVE_STOP_CTL.abort(); }catch(_){} return; }   // tap again = stop (also aborts the in-flight fetch)
   const btn=document.getElementById("driveBtn");
   if(!locations.length){ toast(tr("driveNone")); return; }
 
   driveRunning=true; driveAbort=false;
+  DRIVE_STOP_CTL=new AbortController(); DRIVE_STOP_SIGNAL=DRIVE_STOP_CTL.signal;   // stop signal for this run
   if(btn) btn.classList.add("driving");
   document.body.classList.add("drive-dark");   // battery-saving OLED theme while fetching
   let wake=null;
@@ -1199,6 +1202,7 @@ async function fetchAllSlowly(){
   }
 
   driveRunning=false;
+  DRIVE_STOP_CTL=null; DRIVE_STOP_SIGNAL=null;   // clear stop signal
   try{ if(wake) await wake.release(); }catch(_){}
   document.body.classList.remove("drive-dark");   // restore normal theme when done
   if(btn){ btn.classList.remove("driving"); btn.removeAttribute("data-prog"); }
@@ -1817,12 +1821,27 @@ async function autoRefreshStale(){
    silently fail and the farm would show no data. This retries those with capped
    exponential backoff + jitter, honouring Retry-After when present. Returns parsed
    JSON, or null if the response is non-retryable-not-ok, or throws after giving up. */
-async function fetchJSON(url, {tries=4}={}){
+async function fetchJSON(url, {tries=4, timeoutMs=15000}={}){
   let wait=600;
   for(let attempt=0; attempt<tries; attempt++){
     let res;
-    try{ res=await fetch(url); }
-    catch(e){ if(attempt===tries-1) throw e; await sleep(wait+Math.random()*300); wait=Math.min(wait*2,8000); continue; }
+    // Abort a request that stalls (server accepts but never responds, flaky signal
+    // mid-body). Without this a single hung fetch freezes the whole drive loop and
+    // the stop button can't be reached. On timeout we treat it like a network error.
+    // Also abort immediately if the user taps stop during drive mode.
+    const ctl=new AbortController();
+    const timer=setTimeout(()=>ctl.abort(), timeoutMs);
+    const onStop=()=>ctl.abort();
+    if(typeof DRIVE_STOP_SIGNAL!=="undefined" && DRIVE_STOP_SIGNAL) DRIVE_STOP_SIGNAL.addEventListener("abort",onStop);
+    try{ res=await fetch(url,{signal:ctl.signal}); }
+    catch(e){
+      clearTimeout(timer);
+      if(DRIVE_STOP_SIGNAL) DRIVE_STOP_SIGNAL.removeEventListener("abort",onStop);
+      if(driveAbort) return null;                   // user stopped — bail out quietly, no retries
+      if(attempt===tries-1) throw e; await sleep(wait+Math.random()*300); wait=Math.min(wait*2,8000); continue;
+    }
+    clearTimeout(timer);
+    if(DRIVE_STOP_SIGNAL) DRIVE_STOP_SIGNAL.removeEventListener("abort",onStop);
     if(res.ok) return res.json();
     if(res.status===429 || res.status===503){
       // Signal the drive loop that Open-Meteo is throttling, so it can slow the
