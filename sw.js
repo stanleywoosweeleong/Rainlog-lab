@@ -5,7 +5,7 @@
        results in localStorage). Live weather must never be served stale by the SW.
      - App shell (HTML, JS libs, icons): cache-first, with background refresh.
 */
-const CACHE_VERSION = "rainlog-lab-20260701-30";   // <-- change this string on each deploy
+const CACHE_VERSION = "rainlog-lab-20260701-31";   // <-- change this string on each deploy
 
 const SHELL = [
   "./",
@@ -32,11 +32,13 @@ self.addEventListener("install", (e) => {
   );
 });
 
-// Activate: drop any old version caches.
+// Activate: drop old RainLog Lab caches only. Other apps on this GitHub Pages
+// origin (e.g. EraCam) share the same Cache Storage, so never touch their caches.
+const CACHE_PREFIX = "rainlog-lab-";
 self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_VERSION).map((k) => caches.delete(k)))
+      Promise.all(keys.filter((k) => k.startsWith(CACHE_PREFIX) && k !== CACHE_VERSION).map((k) => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
 });
