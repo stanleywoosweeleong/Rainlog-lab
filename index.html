@@ -689,6 +689,7 @@ const SEED_FARMS = [
   ["Dong - Hong 东区 - 鸿总",4.090556,101.966111,"Raub 劳勿"],
   ["Ulu Gali - Jacky Kuan 乌鲁加里 - Jacky Kuan",3.834694,101.911833,"Raub 劳勿"],
   ["Raub Batu Tiga - James Lye 劳勿三英里 - James",3.79275,101.903889,"Raub 劳勿"],
+  ["Tras 都赖",3.73622,101.80792,"Raub 劳勿"],
   ["Ringlet 冷力",4.41453,101.38415,"Cameron 金马仑"],
   ["Bertam Valley 伯坦谷",4.397,101.381,"Cameron 金马仑"],
   ["Habu 哈布",4.44011,101.38921,"Cameron 金马仑"],
@@ -729,7 +730,6 @@ const SEED_FARMS = [
   ["Bentong Selatan 文冬市南",3.516833,101.897667,"Bentong 文冬"],
   ["Waterway Villa 水道别墅",3.44917,101.90056,"Bentong 文冬"],
   ["Kg. Benus 甘榜本努斯",3.50783,101.92667,"Bentong 文冬"],
-  ["Tras 都赖",3.73622,101.80792,"Bentong 文冬"],
   ["Kampung Hulu Lebu 乌鲁乐布新村",3.57278,101.92611,"Bentong 文冬"],
   ["Kampung Lebu 甘榜乐布",3.616,101.933,"Bentong 文冬"],
   ["Sungai Ruan 双溪兰",3.8542814,101.9430543,"Bentong Team 团队"],
@@ -786,10 +786,12 @@ const SEED_FARMS = [
   ["Tanjung Malim 丹绒马林",3.71778,101.55278,"Uncle Soon 順豪"],
   ["Sungai Lembing 林明",3.85,103.03333,"Uncle Soon 順豪"],
 ];
-const SEED_VERSION = 5;
+const SEED_VERSION = 6;
 const SEED_FLAG = NS+".seeded";
 const SEED_VER_KEY = NS+".seedVersion";
 const REGION_RENAMES = { "Jerantut":"Jerantut 而连突", "Miketam":"Miketam 苏晓薇" };
+// farms that were seeded under the wrong region: name -> [old region, new region]
+const FARM_MOVES = { "Tras 都赖":["Bentong 文冬","Raub 劳勿"] };   // Tras is a mukim of Raub district
 
 (function seedFarms(){
   const seeded = localStorage.getItem(SEED_FLAG)==="1";
@@ -805,6 +807,8 @@ const REGION_RENAMES = { "Jerantut":"Jerantut 而连突", "Miketam":"Miketam 苏
     // rename outdated region labels first (avoids creating duplicates)
     for(const loc of locations){
       if(loc.region && REGION_RENAMES[loc.region]) loc.region = REGION_RENAMES[loc.region];
+      const mv = FARM_MOVES[loc.name];
+      if(mv && loc.region===mv[0]) loc.region = mv[1];
     }
     // back-fill region onto farms lacking it (match by coordinate)
     for(const loc of locations){
