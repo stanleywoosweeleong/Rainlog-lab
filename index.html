@@ -376,6 +376,22 @@
   .empty .big{font-size:52px; margin-bottom:12px}
   .empty .t{font-size:17px; font-weight:900; color:var(--slate-600)}
   .empty .d{font-size:13px; font-weight:600; margin-top:6px}
+  /* first-launch language picker (onboarding) */
+  #langPick{
+    position:fixed; inset:0; z-index:2000; background:var(--slate-50);
+    display:none; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px; padding:24px 16px calc(24px + var(--safe-bottom)); padding-top:calc(24px + var(--safe-top));
+  }
+  #langPick.on{display:flex}
+  #langPick img{width:84px; height:84px; border-radius:22px; box-shadow:0 6px 18px rgba(15,23,42,.15)}
+  #langPick .lp-title{font-size:20px; font-weight:900; color:var(--slate-900); text-align:center; line-height:1.4; letter-spacing:-.01em}
+  #langPick .lp-sub{font-size:13px; font-weight:700; color:var(--slate-500); text-align:center; margin-bottom:6px}
+  #langPick button{
+    width:min(18rem,84vw); min-height:58px; border:2px solid var(--slate-200); border-radius:16px;
+    background:#fff; color:var(--slate-900); font-size:19px; font-weight:800; cursor:pointer;
+    transition:transform .15s, border-color .15s;
+  }
+  #langPick button:active{transform:scale(.97); border-color:var(--blue)}
   /* full-screen user guide */
   .guide-overlay{
     position:fixed; left:0; right:0; bottom:0;
@@ -540,6 +556,16 @@
   <div class="do-name" id="doName"></div>
 </div>
 
+<!-- first-launch language picker (onboarding) -->
+<div id="langPick" role="dialog" aria-label="选择语言 · Choose language · Pilih bahasa">
+  <img src="icon-192.png" alt="RainLog">
+  <div class="lp-title">雨量记录 Lab<br>RainLog Lab</div>
+  <div class="lp-sub">选择语言 · Choose language · Pilih bahasa</div>
+  <button onclick="pickLang('zh')">中文</button>
+  <button onclick="pickLang('en')">English</button>
+  <button onclick="pickLang('ms')">Bahasa Melayu</button>
+</div>
+
 <!-- full-screen user guide -->
 <div class="guide-overlay" id="guideOverlay">
   <div class="guide-top">
@@ -622,12 +648,12 @@ const LANGKEY=NS+".lang";
 const THRESHKEY=NS+".thresh";
 // "Rainy day" threshold (mm). 1.0 = WMO/official standard; 2.5 = agricultural "useful rain".
 let RAIN_DAY_MM=parseFloat(localStorage.getItem(THRESHKEY))||1.0;
-let lang=localStorage.getItem(LANGKEY)||"zh";
 // One-tap language toggle: cycle order + each language's OWN label (shown on the
 // button to indicate the language the UI is currently in).
-// Add more languages here later, e.g. "ms":"BM", "ta":"த".
-const LANG_CYCLE=["zh","en"];
-const LANG_LBL={zh:"中", en:"EN"};
+const LANG_CYCLE=["zh","en","ms"];
+const LANG_LBL={zh:"中", en:"EN", ms:"BM"};
+const savedLang=localStorage.getItem(LANGKEY);
+let lang=LANG_CYCLE.includes(savedLang)?savedLang:"zh";
 // QR code for sharing the app (https://stanleywoosweeleong.github.io/Rainlog-lab/)
 const QR_N=37;
 const QR_PATH="M2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM5 2h1v1h-1zM6 2h1v1h-1zM7 2h1v1h-1zM8 2h1v1h-1zM11 2h1v1h-1zM12 2h1v1h-1zM14 2h1v1h-1zM16 2h1v1h-1zM20 2h1v1h-1zM23 2h1v1h-1zM24 2h1v1h-1zM28 2h1v1h-1zM29 2h1v1h-1zM30 2h1v1h-1zM31 2h1v1h-1zM32 2h1v1h-1zM33 2h1v1h-1zM34 2h1v1h-1zM2 3h1v1h-1zM8 3h1v1h-1zM10 3h1v1h-1zM12 3h1v1h-1zM14 3h1v1h-1zM15 3h1v1h-1zM16 3h1v1h-1zM18 3h1v1h-1zM19 3h1v1h-1zM22 3h1v1h-1zM23 3h1v1h-1zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h1v1h-1zM34 3h1v1h-1zM2 4h1v1h-1zM4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM10 4h1v1h-1zM12 4h1v1h-1zM14 4h1v1h-1zM15 4h1v1h-1zM18 4h1v1h-1zM19 4h1v1h-1zM20 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM28 4h1v1h-1zM30 4h1v1h-1zM31 4h1v1h-1zM32 4h1v1h-1zM34 4h1v1h-1zM2 5h1v1h-1zM4 5h1v1h-1zM5 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h1v1h-1zM12 5h1v1h-1zM13 5h1v1h-1zM23 5h1v1h-1zM24 5h1v1h-1zM25 5h1v1h-1zM26 5h1v1h-1zM28 5h1v1h-1zM30 5h1v1h-1zM31 5h1v1h-1zM32 5h1v1h-1zM34 5h1v1h-1zM2 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM11 6h1v1h-1zM12 6h1v1h-1zM13 6h1v1h-1zM15 6h1v1h-1zM17 6h1v1h-1zM20 6h1v1h-1zM23 6h1v1h-1zM25 6h1v1h-1zM28 6h1v1h-1zM30 6h1v1h-1zM31 6h1v1h-1zM32 6h1v1h-1zM34 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM12 7h1v1h-1zM13 7h1v1h-1zM18 7h1v1h-1zM22 7h1v1h-1zM24 7h1v1h-1zM28 7h1v1h-1zM34 7h1v1h-1zM2 8h1v1h-1zM3 8h1v1h-1zM4 8h1v1h-1zM5 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM22 8h1v1h-1zM24 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM29 8h1v1h-1zM30 8h1v1h-1zM31 8h1v1h-1zM32 8h1v1h-1zM33 8h1v1h-1zM34 8h1v1h-1zM10 9h1v1h-1zM14 9h1v1h-1zM16 9h1v1h-1zM24 9h1v1h-1zM25 9h1v1h-1zM2 10h1v1h-1zM8 10h1v1h-1zM10 10h1v1h-1zM11 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM19 10h1v1h-1zM24 10h1v1h-1zM25 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM28 10h1v1h-1zM31 10h1v1h-1zM32 10h1v1h-1zM33 10h1v1h-1zM2 11h1v1h-1zM3 11h1v1h-1zM4 11h1v1h-1zM5 11h1v1h-1zM6 11h1v1h-1zM7 11h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM17 11h1v1h-1zM20 11h1v1h-1zM21 11h1v1h-1zM23 11h1v1h-1zM25 11h1v1h-1zM30 11h1v1h-1zM31 11h1v1h-1zM32 11h1v1h-1zM3 12h1v1h-1zM7 12h1v1h-1zM8 12h1v1h-1zM9 12h1v1h-1zM12 12h1v1h-1zM13 12h1v1h-1zM17 12h1v1h-1zM20 12h1v1h-1zM22 12h1v1h-1zM23 12h1v1h-1zM24 12h1v1h-1zM26 12h1v1h-1zM30 12h1v1h-1zM32 12h1v1h-1zM33 12h1v1h-1zM3 13h1v1h-1zM6 13h1v1h-1zM11 13h1v1h-1zM13 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1zM17 13h1v1h-1zM18 13h1v1h-1zM21 13h1v1h-1zM22 13h1v1h-1zM24 13h1v1h-1zM25 13h1v1h-1zM28 13h1v1h-1zM29 13h1v1h-1zM30 13h1v1h-1zM31 13h1v1h-1zM32 13h1v1h-1zM33 13h1v1h-1zM4 14h1v1h-1zM7 14h1v1h-1zM8 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM20 14h1v1h-1zM21 14h1v1h-1zM22 14h1v1h-1zM26 14h1v1h-1zM28 14h1v1h-1zM30 14h1v1h-1zM34 14h1v1h-1zM4 15h1v1h-1zM5 15h1v1h-1zM6 15h1v1h-1zM12 15h1v1h-1zM16 15h1v1h-1zM18 15h1v1h-1zM19 15h1v1h-1zM22 15h1v1h-1zM23 15h1v1h-1zM25 15h1v1h-1zM28 15h1v1h-1zM29 15h1v1h-1zM32 15h1v1h-1zM33 15h1v1h-1zM34 15h1v1h-1zM2 16h1v1h-1zM6 16h1v1h-1zM7 16h1v1h-1zM8 16h1v1h-1zM9 16h1v1h-1zM11 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM16 16h1v1h-1zM21 16h1v1h-1zM23 16h1v1h-1zM26 16h1v1h-1zM27 16h1v1h-1zM28 16h1v1h-1zM30 16h1v1h-1zM33 16h1v1h-1zM2 17h1v1h-1zM3 17h1v1h-1zM5 17h1v1h-1zM9 17h1v1h-1zM10 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM20 17h1v1h-1zM21 17h1v1h-1zM27 17h1v1h-1zM29 17h1v1h-1zM32 17h1v1h-1zM34 17h1v1h-1zM2 18h1v1h-1zM5 18h1v1h-1zM6 18h1v1h-1zM7 18h1v1h-1zM8 18h1v1h-1zM9 18h1v1h-1zM11 18h1v1h-1zM14 18h1v1h-1zM15 18h1v1h-1zM16 18h1v1h-1zM19 18h1v1h-1zM21 18h1v1h-1zM22 18h1v1h-1zM24 18h1v1h-1zM25 18h1v1h-1zM26 18h1v1h-1zM27 18h1v1h-1zM29 18h1v1h-1zM30 18h1v1h-1zM34 18h1v1h-1zM5 19h1v1h-1zM9 19h1v1h-1zM10 19h1v1h-1zM13 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM19 19h1v1h-1zM20 19h1v1h-1zM21 19h1v1h-1zM22 19h1v1h-1zM23 19h1v1h-1zM24 19h1v1h-1zM25 19h1v1h-1zM27 19h1v1h-1zM28 19h1v1h-1zM31 19h1v1h-1zM32 19h1v1h-1zM33 19h1v1h-1zM34 19h1v1h-1zM5 20h1v1h-1zM6 20h1v1h-1zM7 20h1v1h-1zM8 20h1v1h-1zM9 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM21 20h1v1h-1zM23 20h1v1h-1zM25 20h1v1h-1zM27 20h1v1h-1zM28 20h1v1h-1zM29 20h1v1h-1zM31 20h1v1h-1zM32 20h1v1h-1zM34 20h1v1h-1zM2 21h1v1h-1zM3 21h1v1h-1zM5 21h1v1h-1zM6 21h1v1h-1zM9 21h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM14 21h1v1h-1zM15 21h1v1h-1zM17 21h1v1h-1zM18 21h1v1h-1zM19 21h1v1h-1zM20 21h1v1h-1zM21 21h1v1h-1zM26 21h1v1h-1zM27 21h1v1h-1zM30 21h1v1h-1zM31 21h1v1h-1zM32 21h1v1h-1zM2 22h1v1h-1zM4 22h1v1h-1zM6 22h1v1h-1zM7 22h1v1h-1zM8 22h1v1h-1zM9 22h1v1h-1zM10 22h1v1h-1zM11 22h1v1h-1zM14 22h1v1h-1zM15 22h1v1h-1zM17 22h1v1h-1zM18 22h1v1h-1zM24 22h1v1h-1zM26 22h1v1h-1zM27 22h1v1h-1zM29 22h1v1h-1zM30 22h1v1h-1zM31 22h1v1h-1zM34 22h1v1h-1zM2 23h1v1h-1zM3 23h1v1h-1zM4 23h1v1h-1zM5 23h1v1h-1zM6 23h1v1h-1zM7 23h1v1h-1zM11 23h1v1h-1zM12 23h1v1h-1zM13 23h1v1h-1zM14 23h1v1h-1zM15 23h1v1h-1zM16 23h1v1h-1zM18 23h1v1h-1zM20 23h1v1h-1zM22 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM30 23h1v1h-1zM31 23h1v1h-1zM2 24h1v1h-1zM4 24h1v1h-1zM5 24h1v1h-1zM7 24h1v1h-1zM8 24h1v1h-1zM10 24h1v1h-1zM13 24h1v1h-1zM14 24h1v1h-1zM15 24h1v1h-1zM16 24h1v1h-1zM17 24h1v1h-1zM18 24h1v1h-1zM22 24h1v1h-1zM24 24h1v1h-1zM26 24h1v1h-1zM30 24h1v1h-1zM33 24h1v1h-1zM2 25h1v1h-1zM7 25h1v1h-1zM9 25h1v1h-1zM13 25h1v1h-1zM14 25h1v1h-1zM15 25h1v1h-1zM16 25h1v1h-1zM21 25h1v1h-1zM22 25h1v1h-1zM24 25h1v1h-1zM25 25h1v1h-1zM27 25h1v1h-1zM28 25h1v1h-1zM29 25h1v1h-1zM30 25h1v1h-1zM31 25h1v1h-1zM32 25h1v1h-1zM34 25h1v1h-1zM2 26h1v1h-1zM3 26h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM9 26h1v1h-1zM10 26h1v1h-1zM11 26h1v1h-1zM14 26h1v1h-1zM17 26h1v1h-1zM18 26h1v1h-1zM26 26h1v1h-1zM27 26h1v1h-1zM28 26h1v1h-1zM29 26h1v1h-1zM30 26h1v1h-1zM31 26h1v1h-1zM33 26h1v1h-1zM34 26h1v1h-1zM10 27h1v1h-1zM11 27h1v1h-1zM12 27h1v1h-1zM13 27h1v1h-1zM15 27h1v1h-1zM16 27h1v1h-1zM17 27h1v1h-1zM18 27h1v1h-1zM20 27h1v1h-1zM21 27h1v1h-1zM22 27h1v1h-1zM26 27h1v1h-1zM30 27h1v1h-1zM32 27h1v1h-1zM34 27h1v1h-1zM2 28h1v1h-1zM3 28h1v1h-1zM4 28h1v1h-1zM5 28h1v1h-1zM6 28h1v1h-1zM7 28h1v1h-1zM8 28h1v1h-1zM12 28h1v1h-1zM14 28h1v1h-1zM15 28h1v1h-1zM17 28h1v1h-1zM20 28h1v1h-1zM22 28h1v1h-1zM23 28h1v1h-1zM25 28h1v1h-1zM26 28h1v1h-1zM28 28h1v1h-1zM30 28h1v1h-1zM32 28h1v1h-1zM33 28h1v1h-1zM2 29h1v1h-1zM8 29h1v1h-1zM12 29h1v1h-1zM13 29h1v1h-1zM17 29h1v1h-1zM21 29h1v1h-1zM25 29h1v1h-1zM26 29h1v1h-1zM30 29h1v1h-1zM31 29h1v1h-1zM32 29h1v1h-1zM34 29h1v1h-1zM2 30h1v1h-1zM4 30h1v1h-1zM5 30h1v1h-1zM6 30h1v1h-1zM8 30h1v1h-1zM20 30h1v1h-1zM21 30h1v1h-1zM24 30h1v1h-1zM26 30h1v1h-1zM27 30h1v1h-1zM28 30h1v1h-1zM29 30h1v1h-1zM30 30h1v1h-1zM31 30h1v1h-1zM33 30h1v1h-1zM2 31h1v1h-1zM4 31h1v1h-1zM5 31h1v1h-1zM6 31h1v1h-1zM8 31h1v1h-1zM12 31h1v1h-1zM18 31h1v1h-1zM19 31h1v1h-1zM21 31h1v1h-1zM23 31h1v1h-1zM26 31h1v1h-1zM27 31h1v1h-1zM29 31h1v1h-1zM30 31h1v1h-1zM33 31h1v1h-1zM34 31h1v1h-1zM2 32h1v1h-1zM4 32h1v1h-1zM5 32h1v1h-1zM6 32h1v1h-1zM8 32h1v1h-1zM11 32h1v1h-1zM12 32h1v1h-1zM13 32h1v1h-1zM16 32h1v1h-1zM18 32h1v1h-1zM21 32h1v1h-1zM22 32h1v1h-1zM26 32h1v1h-1zM29 32h1v1h-1zM30 32h1v1h-1zM32 32h1v1h-1zM33 32h1v1h-1zM34 32h1v1h-1zM2 33h1v1h-1zM8 33h1v1h-1zM12 33h1v1h-1zM13 33h1v1h-1zM15 33h1v1h-1zM17 33h1v1h-1zM18 33h1v1h-1zM21 33h1v1h-1zM24 33h1v1h-1zM28 33h1v1h-1zM29 33h1v1h-1zM30 33h1v1h-1zM31 33h1v1h-1zM32 33h1v1h-1zM2 34h1v1h-1zM3 34h1v1h-1zM4 34h1v1h-1zM5 34h1v1h-1zM6 34h1v1h-1zM7 34h1v1h-1zM8 34h1v1h-1zM10 34h1v1h-1zM11 34h1v1h-1zM13 34h1v1h-1zM16 34h1v1h-1zM19 34h1v1h-1zM24 34h1v1h-1zM25 34h1v1h-1zM26 34h1v1h-1zM27 34h1v1h-1zM29 34h1v1h-1zM33 34h1v1h-1z";
@@ -927,6 +953,70 @@ const T={
          p:"Rainfall comes from <b>Open-Meteo</b>: older days use <b>ERA5 reanalysis</b> (archive-api, ~5-day lag), with the recent tail filled from a forecast model's past_days.<br><b>Note:</b> ERA5 is reanalysis, <b>not a gauge reading at your orchard</b>. Under tropical convective downpours, point rainfall can differ from what actually fell. This Lab is for comparison and building experience — your <b>on-the-ground rain gauge</b> remains the ground truth."}
       ]
     }
+  },
+  ms:{
+    title:"RainLog Lab", sub:"3 BULAN LEPAS · LAB",
+    attrib:"Data: Open-Meteo (CC BY 4.0) · Dikod dengan Claude",
+    shCur:"Kemarau semasa", shHot:"daripadanya ≥30°C", shNone:"Tiada kemarau sekarang (hujan semalam)", shSeasonHist:"Terpanjang tahun ini", shHist:"Puncak 16 bln", shFlower:"🌸 Tempoh aruhan bunga", shDayUnit:"h",
+    add:"Tambah", sheetTitle:"Tambah lokasi", sheetDesc:"Namakan lokasi, kemudian masukkan koordinat atau guna GPS.",
+    lName:"NAMA LOKASI / 名称", lCoords:"KOORDINAT LAT / LNG", gps:"Guna lokasi GPS saya",
+    cancel:"Batal", save:"Simpan",
+    emptyT:"Belum ada lokasi", filterPlaceholder:"Cari kebun…", noMatch:"Tiada kebun sepadan", ungrouped:"Lain-lain", updateRegion:"Kemas kini semua kebun di kawasan ini", regionDone:(n)=>`${n} kebun dikemas kini`, regionDonePartial:(ok,n)=>`${ok}/${n} dikemas kini (ada yang gagal, cuba lagi)`, exportAll:"Eksport semua kebun Excel", exportNone:"Belum ada data untuk dieksport", colFarm:"Kebun", colRegion:"Kawasan", colLat:"Latitud", colLng:"Longitud", dataSheet:"Data harian", summarySheet:"Ringkasan kebun", driveProg:"Mengambil", driveNone:"Belum ada kebun untuk diambil", driveStart:(n)=>`Mod Pandu: mengambil ${n} kebun perlahan-lahan. Skrin boleh tidur, tetapi biarkan aplikasi terbuka.`, driveDone:(n,sk)=>sk?`Kesemua ${n} sedia (${sk} sudah siap hari ini)`:`Kesemua ${n} kebun diambil ✓`, driveDonePartial:(ok,n)=>`${ok}/${n} diambil (ada yang gagal — tekan lagi untuk selesaikan)`, driveStopped:(d,n)=>`Dihentikan (${d}/${n} siap — tekan untuk sambung)`, emptyD:"Tekan butang “＋ Tambah” di penjuru kanan atas untuk mula merekod hujan.",
+    get:"Dapatkan hujan", reget:"Muat semula", xls:"Eksport Excel",
+    total:"Jumlah hujan", rainy:"Hari hujan", daysTotal:"Jumlah hari", daysCovered:"Hari diliputi", daysMissing:"Hari tiada data",
+    threshLabel:"Asas hari hujan", threshOfficial:"Rasmi", threshOfficialSub:"≥1mm", threshUseful:"Berkesan", threshUsefulSub:"≥2.5mm",
+    loading:"Memuatkan…", loaded:n=>`Dikemas kini · ${n} hari`, cached:"Data tersimpan · muat semula untuk kemas kini",
+    errFetch:"Gagal mengambil data. Semak sambungan dan cuba lagi.",
+    needName:"Sila masukkan nama lokasi.", needCoords:"Sila masukkan koordinat yang sah.",
+    gpsWait:"Mencari lokasi…", gpsOk:"Lokasi ditemui ✓", gpsFail:"Tidak dapat mengesan lokasi. Masukkan secara manual.", gpsNo:"GPS tidak disokong.",
+    confirmDel:n=>`Padam “${n}”?`, xlNoData:"Dapatkan data hujan dahulu.",
+    share:"Kongsi", edit:"Sunting", del:"Padam",
+    editTitle:"Sunting lokasi", editDesc:"Tukar nama atau tetapkan semula koordinat.",
+    binTitle:"Tong kitar semula", binDesc:"Pulihkan lokasi yang dipadam, atau buang terus.", binEmpty:"Tong kitar semula kosong", restore:"Pulihkan", purge:"Padam kekal",
+    recycleTab:"Tong kitar semula", backToAdd:"Kembali ke tambah",
+    confirmPurge:n=>`Padam “${n}” secara kekal? Tindakan ini tidak boleh dibatalkan.`,
+    colDate:"Tarikh", colWeek:"Hari", colMM:"Hujan (mm)", colDT:"Delta-T (°C)", colTMax:"Suhu maks (°C)",
+    sumLabel:"Ringkasan", sheetName:"Hujan_harian",
+    last14:"18 hari lepas", maxLabel:n=>`maks ${n} mm`, byMonth:"Ikut bulan", monthSheet:"Ikut_bulan",
+    dryTitle:"Kemarau (isyarat berbunga)", dryCurrent:"Kemarau semasa", dryLongest:"Kemarau terpanjang", drySeasonLongest:"Terpanjang tahun ini", dryAllTime:(n)=>`Puncak 16 bln: ${n}h`, dayUnit:"h", flagNear:(n)=>`⚑ ${n} hari kering — menghampiri tempoh keluar putik (14–18h), perhatikan`, flagPrime:(n)=>`${n} hari kering — dalam tempoh keluar putik (14–18h), peluang aruhan baik`, flagPast:(n)=>`${n} hari kering — melepasi tempoh 14–18h; kemarau berpanjangan boleh menekan pokok`,
+    dtTitle:"Trend Delta-T", dtTitleSub:"(18h lepas · tengah hari 12–3ptg)", dtLatest:"terkini", dtAbbr:"ΔT", dtTempAbbr:"maks", dtLegendDT:"Delta-T", dtLegendTemp:"Suhu maks", dtRef:"Rujukan: 2–8 sesuai untuk menyembur, 8–10 sederhana, >10 penyejatan terlalu cepat, <2 terlalu lembap. Garis putus merah = ΔT 10: hari melebihinya, semburan mungkin tidak berkesan. Garis putus hijau = 30°C: hari pada atau melebihinya, bersama kemarau, membantu aruhan bunga. Rekod sejarah, bukan nasihat masa nyata.",
+    partialNote:"* Bulan tidak lengkap (hanya sebahagian hari).",
+    colMonth:"Bulan", colMonthMM:"Hujan bulanan (mm)", colMonthDays:"Hari hujan",
+    monthNames:["Jan","Feb","Mac","Apr","Mei","Jun","Jul","Ogo","Sep","Okt","Nov","Dis"],
+    week:["Ahd","Isn","Sel","Rab","Kha","Jum","Sab"],
+    guideTitle:"Panduan Pengguna",
+    guide:{
+      intro:"RainLog menunjukkan sejarah hujan kebun anda untuk tiga bulan lepas bagi membantu pengurusan durian. Semua data datang dari Open-Meteo dan disimpan dalam telefon selepas diambil, jadi ia boleh digunakan tanpa talian.",
+      qrTitle:"Kongsi aplikasi ini",
+      qrSub:"Biar rakan imbas untuk membuka RainLog.",
+      foot:"Data: Open-Meteo (data grid ERA5 — rujukan kawasan luas yang mungkin sedikit berbeza daripada tolok hujan di kebun anda). Aplikasi ini hanya rekod sejarah, bukan nasihat agronomi masa nyata.",
+      sections:[
+        {icon:"➕",bg:"#dbeafe",fg:"#1d4ed8",h:"Tambah kebun",
+         p:"Tekan <b>＋</b> di penjuru kanan atas, masukkan nama, kemudian taip koordinat atau tekan “Guna lokasi GPS saya”. Kebun yang disimpan muncul di skrin utama. Namun kebanyakan kebun sudah dimuatkan terlebih dahulu (lihat di bawah)."},
+        {icon:"🗺️",bg:"#eef2ff",fg:"#4f46e5",h:"Kebun anda sudah dimuatkan",
+         p:"Aplikasi ini datang dengan ~110 kebun sedia dimuatkan (semua ladang dalam keluarga WeatherNext), jadi <b>anda tidak perlu menambahnya sendiri</b>. Kebun dikumpulkan mengikut kawasan — tekan tajuk kawasan untuk buka atau tutup. Apabila senarai panjang, kotak carian di atas membolehkan anda mencari kebun mengikut nama."},
+        {icon:"🌧️",bg:"#dbeafe",fg:"#1d4ed8",h:"Dapatkan hujan",
+         p:"Tekan butang biru <b>Dapatkan hujan</b> pada kad. Ia mengambil <b>16 bulan</b> data hujan harian (meliputi kedua-dua musim durian setahun, supaya anda boleh bandingkan dengan tempoh sama tahun lepas). Data disimpan, jadi tidak perlu ambil semula setiap kali — tekan “Muat semula” untuk kemas kini. <b>Pengambilan sejarah pertama untuk semua kebun adalah besar — sebaiknya dibuat semalaman dengan pengecas + Wi-Fi: tekan “Mod Pandu” sebelum tidur dan biarkan ia berjalan.</b> Selepas itu, kemas kini harian adalah ringan."},
+        {icon:"↻",bg:"#dbeafe",fg:"#1d4ed8",h:"Kemas kini seluruh kawasan sekaligus",
+         p:"Buka sesuatu kawasan dan tekan butang <b>↻</b> pada tajuknya — aplikasi akan mengambil hujan untuk <b>setiap</b> kebun di kawasan itu satu demi satu, dengan kemajuan ditunjukkan pada butang (cth. 3/15). Ia dikawal (paling banyak dua permintaan serentak) supaya tidak membebankan pelayan. Jika anda mengurus banyak kebun, ini jauh lebih mudah daripada mengambil satu per satu."},
+        {icon:"🚗",bg:"#eff6ff",fg:"#1d4ed8",h:"Mod Pandu (ambil semua sekaligus)",
+         p:"Tekan ikon <b>kereta</b> di atas untuk mengambil hujan bagi <b>setiap</b> kebun, perlahan-lahan, satu demi satu.<br>Semasa berjalan, skrin bertukar menjadi <b>paparan hitam penjimat kuasa</b> dengan kiraan kemajuan besar di tengah (cth. 6/114) dan nama kebun yang sedang diambil — skrin hitam memadamkan piksel OLED untuk menjimatkan bateri, sesuai dijalankan semalaman.<br>Kebun yang sudah diambil hari ini (dengan sejarah lengkap) akan dilangkau; yang sejarahnya belum lengkap akan dilengkapkan. Untuk berhenti di tengah jalan, <b>tekan ikon kereta sekali lagi</b> — anda boleh sambung kemudian. Skrin boleh tidur, tetapi biarkan aplikasi terbuka."},
+        {icon:"📊",bg:"#ecfdf5",fg:"#047857",h:"Jumlah hujan & hari hujan",
+         p:"Bahagian atas kad menunjukkan jumlah hujan bagi tempoh itu dan bilangan hari hujan. Kiraan hari hujan bergantung pada <b>Asas hari hujan</b> di bawah."},
+        {icon:"🌦️",bg:"#dbeafe",fg:"#1d4ed8",h:"Dua piawaian hari hujan",
+         p:"<b>Asas hari hujan</b> di atas menukar antara dua cara pengiraan:<br><b>Rasmi ≥1mm (WMO)</b> — piawaian Pertubuhan Meteorologi Sedunia; mana-mana hari dengan 1mm atau lebih dikira sebagai hari hujan. Digunakan dalam statistik cuaca rasmi.<br><b>Berkesan ≥2.5mm</b> — pandangan pertanian; hanya hujan yang benar-benar membasahi tanah dan membantu pokok dikira, renyai-renyai diabaikan.<br>Kebanyakan pekebun dapati “Berkesan” lebih sepadan dengan keadaan di ladang. Pertukaran berlaku serta-merta, tidak perlu ambil semula, dan turut mempengaruhi kiraan kemarau di bawah."},
+        {icon:"🌥️",bg:"#fff7ed",fg:"#c2410c",h:"Kemarau (isyarat berbunga)",
+         p:"Menunjukkan <b>kemarau terpanjang tahun ini</b> (sejak 1 Jan) dan kemarau <b>semasa</b>, berserta tarikh; baris kecil di bawah menambah <b>puncak 16 bulan</b> sebagai perbandingan tahun lepas. Kenapa diasingkan? Durian berbuah dua musim setahun, jadi puncak 16 bulan mungkin milik tahun lepas dan menutup kemarau musim ini — kad mengutamakan 'tahun ini'. Kajian menunjukkan <b>14–18 hari kering</b> menggalakkan keluar putik; aplikasi memberi amaran awal dari <b>12 hari</b> supaya anda boleh bersedia. “Hari kering” mengikut asas hari hujan di atas."},
+        {icon:"📈",bg:"#eef2ff",fg:"#4f46e5",h:"Trend Delta-T",
+         p:"Delta-T puncak harian (12–3ptg) bagi 18 hari lepas. Delta-T menggambarkan kadar penyejatan udara — berguna untuk menyemak hari lepas yang <b>sesuai untuk menyembur</b>. Rujukan: 2–8 sesuai, 8–10 sederhana, >10 terlalu kering, <2 terlalu lembap. Rekod sejarah sahaja."},
+        {icon:"👆",bg:"#f1f5f9",fg:"#475569",h:"Tindakan kad",
+         p:"<b>Leret ke kiri</b>, tekan <b>⋯</b>, atau <b>klik kanan</b> di komputer untuk memaparkan Kongsi / Sunting / Padam. Kebun yang dipadam masuk ke tong kitar semula, di mana anda boleh memulihkan atau memadamnya secara kekal."},
+        {icon:"📤",bg:"#ecfdf5",fg:"#047857",h:"Eksport & kongsi",
+         p:"Tekan <b>Eksport Excel</b> untuk menyimpan hujan harian, Delta-T dan ringkasan bulanan sebagai hamparan. <b>Kongsi</b> menangkap seluruh kad sebagai gambar dan menghantarnya melalui menu kongsi telefon (cth. WhatsApp). Di atas senarai kebun, <b>Eksport semua kebun</b> menggabungkan data harian setiap kebun yang telah dimuatkan ke dalam satu fail untuk analisis bersama."},
+        {icon:"🔬",bg:"#eef2ff",fg:"#4f46e5",h:"Dari mana data datang (nota Lab)",
+         p:"Data hujan datang dari <b>Open-Meteo</b>: hari-hari lama menggunakan <b>analisis semula ERA5</b> (archive-api, lewat ~5 hari), manakala hari-hari terkini diisi daripada past_days model ramalan.<br><b>Perhatian:</b> ERA5 ialah analisis semula, <b>bukan bacaan tolok hujan di kebun anda</b>. Semasa hujan lebat perolakan tropika, hujan setempat boleh berbeza daripada yang sebenarnya turun. Lab ini untuk perbandingan dan menimba pengalaman — <b>tolok hujan di kebun anda</b> tetap rujukan sebenar."}
+      ]
+    }
   }
 };
 function tr(k){return T[lang][k]}
@@ -947,11 +1037,19 @@ function applyLang(){
 }
 function toggleLang(){
   // One tap = switch immediately. The button label always shows the language the
-  // UI is currently in (中 when Chinese, EN when English).
+  // UI is currently in (中 Chinese, EN English, BM Malay).
   const i=LANG_CYCLE.indexOf(lang);
   lang=LANG_CYCLE[(i+1)%LANG_CYCLE.length];
   localStorage.setItem(LANGKEY,lang);
   applyLang();   // re-renders the UI and refreshes the button label
+}
+
+/* ===== onboarding: pick a language on first launch ===== */
+function pickLang(l){
+  lang=l;
+  localStorage.setItem(LANGKEY,lang);
+  document.getElementById("langPick").classList.remove("on");
+  applyLang();
 }
 
 /* ===== user guide ===== */
@@ -1496,7 +1594,7 @@ function monthRollupHTML(days){
       <div class="month-name">${monthLabel(m.key)}${star}</div>
       <div class="month-track"><div class="month-fill" style="width:${w}%"></div></div>
       <div class="month-mm tabular">${m.mm.toFixed(1)}</div>
-      <div class="month-days tabular">${m.rainy}${lang==="zh"?"天":"d"}</div>
+      <div class="month-days tabular">${m.rainy}${tr("dayUnit")}</div>
     </div>`;
   }).join("");
   const anyPartial=months.some(m=>{const dim=new Date(parseInt(m.key.slice(0,4)),parseInt(m.key.slice(5,7)),0).getDate(); return m.known<dim;});
@@ -2146,6 +2244,7 @@ function exportXLS(id){
 }
 Object.keys(cache).forEach(k=>{if(cache[k]) cache[k].stale=true});
 applyLang();
+if(!LANG_CYCLE.includes(savedLang)) document.getElementById("langPick").classList.add("on");
 window.addEventListener("load",()=>{
   setTimeout(()=>{
     const b=document.getElementById("boot-screen");
