@@ -1352,17 +1352,21 @@ function rainyCount(days){
 
 /* dry-spell analysis: a "dry day" = below the chosen rainy threshold.
    Returns current ongoing streak (up to the last day) and the longest spell. */
+function isDry(d){ return d.mm!=null && d.mm<RAIN_DAY_MM; }
 function drySpells(days){
-  // known days only, in chronological order
-  const seq=days.filter(d=>d.mm!=null);
+  // All days in chronological order. A day with no data (mm null) breaks a run
+  // just like a wet day: we have no evidence it stayed dry, so dry → unknown → dry
+  // must not count as one continuous spell.
+  const seq=days;
   let longest=0, longestEnd=-1, run=0;
   for(let i=0;i<seq.length;i++){
-    if(seq[i].mm<RAIN_DAY_MM){ run++; if(run>longest){longest=run; longestEnd=i;} }
+    if(isDry(seq[i])){ run++; if(run>longest){longest=run; longestEnd=i;} }
     else run=0;
   }
-  // current streak = dry days at the very end of the sequence
+  // current streak = verified dry days at the very end of the window
+  // (if the latest day has no data, there is no verified current streak)
   let cur=0;
-  for(let i=seq.length-1;i>=0;i--){ if(seq[i].mm<RAIN_DAY_MM) cur++; else break; }
+  for(let i=seq.length-1;i>=0;i--){ if(isDry(seq[i])) cur++; else break; }
   let longestRange=null;
   if(longest>0 && longestEnd>=0){
     longestRange={start:seq[longestEnd-longest+1].date, end:seq[longestEnd].date};
@@ -1381,8 +1385,8 @@ function drySpells(days){
   let sLongest=0, sEnd=-1, sRun=0;
   for(let i=0;i<seq.length;i++){
     const inYear = seq[i].date>=jan1;
-    if(seq[i].mm<RAIN_DAY_MM && inYear){ sRun++; if(sRun>sLongest){sLongest=sRun; sEnd=i;} }
-    else sRun=0;   // wet day OR pre-Jan-1 day breaks the in-year run
+    if(isDry(seq[i]) && inYear){ sRun++; if(sRun>sLongest){sLongest=sRun; sEnd=i;} }
+    else sRun=0;   // wet day, missing day OR pre-Jan-1 day breaks the in-year run
   }
   let seasonRange=null;
   if(sLongest>0 && sEnd>=0){
@@ -1751,8 +1755,7 @@ async function shareLoc(id){
       m+=`\n${tr("shFlower")}`;
       if(s.current>0){
         // count, within the trailing dry run, days whose high reached 30°C+
-        const seq=c.days.filter(d=>d.mm!=null);
-        const tail=seq.slice(-s.current);
+        const tail=c.days.slice(-s.current);
         const hot=tail.filter(d=>d.tmax!=null && d.tmax>=30).length;
         const range=spellDates(s.currentRange);
         m+=`\n${tr("shCur")}: ${s.current} ${tr("shDayUnit")}${range?` (${range})`:""}`;
@@ -2071,6 +2074,9 @@ async function getRain(id, opts={}){
     };
     const applyHourly=(times,temps,rhs)=>{
       if(!times) return;
+      // Max of THIS response per day, then replace the cached value, so a corrected
+      // (lower) reading can overwrite an earlier one instead of being masked by it.
+      const fresh=new Map();
       times.forEach((t,i)=>{
         const hr=parseInt(t.slice(11,13),10);       // "2026-05-03T13:00" -> 13
         if(hr<12 || hr>15) return;                  // only the 12:00–15:00 spray-risk window
@@ -2079,9 +2085,10 @@ async function getRain(id, opts={}){
         const dt=deltaT(T,RH);
         if(dt==null) return;
         const day=t.slice(0,10);
-        const prev=dtMap.get(day);
-        if(prev==null || dt>prev) dtMap.set(day, dt);  // keep the worst (highest) of the window
+        const prev=fresh.get(day);
+        if(prev==null || dt>prev) fresh.set(day, dt);  // keep the worst (highest) of the window
       });
+      for(const [day,dt] of fresh) dtMap.set(day, dt);
     };
 
     // 1) Archive (ERA5) — daily rainfall + max-temp for the recent tail only.
@@ -2098,7 +2105,7 @@ async function getRain(id, opts={}){
     // Archive daily (bulk of the tail)
     try{
       const aj=await fetchJSON(archiveUrl);
-      if(aj){
+      if(aj && Array.isArray(aj.daily?.time) && aj.daily.time.length){
         apply(aj.daily?.time, aj.daily?.precipitation_sum);
         applyTmax(aj.daily?.time, aj.daily?.temperature_2m_max);
         archiveOk=true; }
@@ -2106,15 +2113,19 @@ async function getRain(id, opts={}){
     // Forecast — recent daily values + hourly Delta-T for the last DT_DAYS days
     try{
       const fj=await fetchJSON(fcUrl);
-      if(fj){
+      if(fj && Array.isArray(fj.daily?.time) && fj.daily.time.length){
         apply(fj.daily?.time, fj.daily?.precipitation_sum);
         applyTmax(fj.daily?.time, fj.daily?.temperature_2m_max);
         applyHourly(fj.hourly?.time, fj.hourly?.temperature_2m, fj.hourly?.relative_humidity_2m);
         fcOk=true; }
     }catch(_){}
 
-    // Accept the fetch if a source responded OR we still hold prior history to keep.
-    if(!archiveOk && !fcOk && !prevDays.length) throw new Error("both sources failed");
+    // Neither source returned usable data: leave the saved history and its
+    // timestamp untouched (so drive mode / auto-refresh retry it) and report failure.
+    if(!archiveOk && !fcOk){
+      if(cache[id]){ cache[id].stale=true; saveCache(); }
+      throw new Error("both sources failed");
+    }
 
     // Drop Delta-T readings older than the DT_DAYS window (we no longer refresh them,
     // and they aren't actionable for spray timing beyond ~18 days).
@@ -2131,7 +2142,11 @@ async function getRain(id, opts={}){
     const rainy=known.filter(d=>d.mm>=RAIN_DAY_MM).length;
     const missing=days.length-known.length;
 
-    cache[id]={days,total,rainy,missing,stale:false,fetched:Date.now(),coveredFrom:(wantFull?startStr:(cache[id]&&cache[id].coveredFrom)||tailStartStr)};
+    // Only advance coverage when the archive actually delivered the requested range;
+    // otherwise keep the old marker so the next refresh re-pulls the missing history.
+    const prevCovered=(cache[id]&&cache[id].coveredFrom)||null;
+    const coveredFromNew=archiveOk ? (wantFull?startStr:(prevCovered||tailStartStr)) : prevCovered;
+    cache[id]={days,total,rainy,missing,stale:false,fetched:Date.now(),coveredFrom:coveredFromNew};
     saveCache();
     if(!opts.quiet) render();
     return true;
