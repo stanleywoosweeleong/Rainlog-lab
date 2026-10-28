@@ -544,7 +544,7 @@
     <button class="add-btn" id="addBtn" onclick="openSheet()" title="添加地点 Add location" aria-label="添加地点 Add location">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
-    <button class="lang-btn" id="langBtn" onclick="toggleLang()">中</button>
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()">中文</button>
   </div>
 </header>
 
@@ -557,13 +557,12 @@
 </div>
 
 <!-- first-launch language picker (onboarding) -->
-<div id="langPick" role="dialog" aria-label="选择语言 · Choose language · Pilih bahasa">
+<div id="langPick" role="dialog" aria-label="中文 · English · Malay">
   <img src="icon-192.png" alt="RainLog">
   <div class="lp-title">雨量记录 Lab<br>RainLog Lab</div>
-  <div class="lp-sub">选择语言 · Choose language · Pilih bahasa</div>
   <button onclick="pickLang('zh')">中文</button>
   <button onclick="pickLang('en')">English</button>
-  <button onclick="pickLang('ms')">Bahasa Melayu</button>
+  <button onclick="pickLang('ms')">Malay</button>
 </div>
 
 <!-- full-screen user guide -->
@@ -651,7 +650,7 @@ let RAIN_DAY_MM=parseFloat(localStorage.getItem(THRESHKEY))||1.0;
 // One-tap language toggle: cycle order + each language's OWN label (shown on the
 // button to indicate the language the UI is currently in).
 const LANG_CYCLE=["zh","en","ms"];
-const LANG_LBL={zh:"中", en:"EN", ms:"BM"};
+const LANG_LBL={zh:"中文", en:"EN", ms:"BM"};
 const savedLang=localStorage.getItem(LANGKEY);
 let lang=LANG_CYCLE.includes(savedLang)?savedLang:"zh";
 // QR code for sharing the app (https://stanleywoosweeleong.github.io/Rainlog-lab/)
